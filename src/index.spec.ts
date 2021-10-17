@@ -1,3 +1,11 @@
+// SPDX-License-Identifier: MIT
+
+/**
+ * This file originated by the repository template, that was used to create this
+ * repository.
+ * It will be removed or adjusted, once there are other tests to be run.
+ */
+
 /* Test specific imports */
 import { describe, expect, it } from "@jest/globals";
 
