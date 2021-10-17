@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    ".prettierignore": "ignore"
+  },
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true
+  }
+}

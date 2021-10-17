@@ -1,0 +1,8 @@
+# Actually the "dist/" directory's content should not be under version control.
+# However, it should be present!
+
+# ignore everything...
+*
+
+# ...except this file
+!.gitignore

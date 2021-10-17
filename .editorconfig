@@ -1,0 +1,20 @@
+# EditorConfig for a NodeJS module
+#
+# Remember: EditorConfig is awesome (https://editorconfig.org)!
+
+
+# this is the top most editorconfig file and source of all truth
+root = true
+
+[*]
+charset = utf-8                 # default charset
+indent_style = space            # use spaces to indent
+indent_size = 2                 # 2 spaces as indent
+end_of_line = lf                # use UNIX-style EOL
+insert_final_newline = true     # insert an empty line at the end of all files
+trim_trailing_whitespace = true # no trailing whitespaces
+
+# Makefiles always use tabs for indentation
+[Makefile]
+indent_style = tab
+
