@@ -1,3 +1,3 @@
-# node-module-skeleton
+# ImP
 
-A skeleton to create TypeScript-based NodeJS modules
+The ImP is a NodeJS-based image processor, which relies on Sharp.
