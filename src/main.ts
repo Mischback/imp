@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 /* internal imports */
-import { logger } from "./lib/logging";
+import { logger, applyDebugConfiguration } from "./lib/logging";
 
 /* *** INTERNAL CONSTANTS *** */
 const EXIT_SUCCESS = 0; // sysexits.h: 0 -> successful termination
@@ -15,13 +15,19 @@ export function main(argv: string[]): Promise<number> {
      * At least it will resolve to the "correct" exit code.
      */
     process.on("SIGINT", () => {
-      // logger.info("Caught interrupt signal (Ctrl-C). Exiting!");
       logger.info("Caught interrupt signal (Ctrl-C). Exiting!");
       return reject(EXIT_SIGINT);
     });
 
-    // FIXME: Just for compilation
-    logger.info(argv);
+    /* Activate the debug mode as early as possible
+     * This is done without getopt() from stdio, because getopt() will be called
+     * later during startup.
+     * TODO: As of now, "-d" is hardcoded. Probably this should be made
+     *       dependent of the actual configuration.
+     */
+    if (argv.indexOf("-d") > -1) {
+      applyDebugConfiguration();
+    }
 
     return resolve(EXIT_SUCCESS);
   });

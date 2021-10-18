@@ -3,6 +3,13 @@
 /* Library imports */
 import { ISettingsParam, Logger } from "tslog";
 
+const debugLoggingConfiguration: ISettingsParam = {
+  minLevel: "debug",
+  displayFunctionName: true,
+  displayFilePath: "hideNodeModulesOnly",
+  printLogMessageInNewLine: true,
+};
+
 const defaultLoggingConfiguration: ISettingsParam = {
   name: "ImP",
   displayLoggerName: true,
@@ -12,3 +19,10 @@ const defaultLoggingConfiguration: ISettingsParam = {
 };
 
 export const logger = new Logger(defaultLoggingConfiguration);
+
+export function applyDebugConfiguration(
+  debugConf: ISettingsParam = debugLoggingConfiguration
+): void {
+  logger.setSettings(debugConf);
+  logger.debug("Activated debug mode...");
+}
