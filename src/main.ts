@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 
 /* internal imports */
+import { getConfig } from "./lib/configure";
 import { logger, applyDebugConfiguration } from "./lib/logging";
 
 /* *** INTERNAL CONSTANTS *** */
 const EXIT_SUCCESS = 0; // sysexits.h: 0 -> successful termination
-// const EXIT_INTERNAL_ERROR = 70; // sysexits.h: 70 -> internal software error
+const EXIT_INTERNAL_ERROR = 70; // sysexits.h: 70 -> internal software error
 const EXIT_SIGINT = 130; // bash scripting guide: 130 -> terminated by ctrl-c
 
 export function main(argv: string[]): Promise<number> {
@@ -29,6 +30,18 @@ export function main(argv: string[]): Promise<number> {
       applyDebugConfiguration();
     }
 
-    return resolve(EXIT_SUCCESS);
+    /* The actual payload starts here */
+    getConfig(argv)
+      .then(() => {
+        return resolve(EXIT_SUCCESS);
+      })
+      .catch((err) => {
+        /* general error handler */
+        logger.error("Whoops, that was unexpected!");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        logger.error(err.message);
+        logger.fatal("An unexpected error occured. Aborting!");
+        return reject(EXIT_INTERNAL_ERROR);
+      });
   });
 }
