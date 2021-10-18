@@ -1,13 +1,27 @@
 // SPDX-License-Identifier: MIT
 
+/* library imports */
+import { Config } from "stdio/dist/getopt";
+
 /* internal imports */
 import { getConfig } from "./lib/configure";
+import { ImpConfigureError } from "./lib/errors";
 import { logger, applyDebugConfiguration } from "./lib/logging";
 
 /* *** INTERNAL CONSTANTS *** */
 const EXIT_SUCCESS = 0; // sysexits.h: 0 -> successful termination
 const EXIT_INTERNAL_ERROR = 70; // sysexits.h: 70 -> internal software error
+const EXIT_CONFIG_ERROR = 78; // sysexits.h: 78 -> configuration error
 const EXIT_SIGINT = 130; // bash scripting guide: 130 -> terminated by ctrl-c
+
+const cmdLineOptions: Config = {
+  debug: {
+    description: "Activate debug mode",
+    key: "d",
+    required: false,
+    default: false,
+  },
+};
 
 export function main(argv: string[]): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -31,11 +45,18 @@ export function main(argv: string[]): Promise<number> {
     }
 
     /* The actual payload starts here */
-    getConfig(argv)
+    getConfig(argv, cmdLineOptions)
       .then(() => {
         return resolve(EXIT_SUCCESS);
       })
       .catch((err) => {
+        /* handle "known" errors */
+        if (err instanceof ImpConfigureError) {
+          logger.error(err.message);
+          logger.fatal("Could not determine configuration for ImP!");
+          return reject(EXIT_CONFIG_ERROR);
+        }
+
         /* general error handler */
         logger.error("Whoops, that was unexpected!");
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
