@@ -10,6 +10,25 @@ import { Config } from "stdio/dist/getopt";
 import { ImpConfigureError } from "./errors";
 import { logger } from "./logging";
 
+/* *** TYPE DEFINITIONS *** */
+// FIXME: Apply correct type to targets/formatOptions
+interface ImpIntermediateConfig {
+  inputFiles?: string[];
+  outputDir?: string;
+  targets: string;
+  formatOptions: string;
+  loggingOptions?: string;
+}
+
+// FIXME: Apply correct type to targets/formatOptions
+interface ImpConfig {
+  inputFiles: string[];
+  outputDir: string;
+  targets: string;
+  formatOptions: string;
+  loggingOptions?: string;
+}
+
 /* *** INTERNAL CONSTANTS *** */
 
 class ImpConfigureCosmiconfError extends ImpConfigureError {
@@ -33,10 +52,59 @@ function cosmiconfigWrapper(
   }
 }
 
+/**
+ * Check the results of Cosmiconfig and handle possible return states.
+ *
+ * Because Cosmiconfig will actually *resolve* with empty return values, that
+ * are not usable for this module, these return values have to be handled in
+ * a special way.
+ * Parsing and consequently rejecting in the body of getConfig() raised all
+ * types of (I guess TypeScript-specific) typing problems, thus, this function
+ * performs the required checks, rejects with its own error type, which is
+ * handled in getConfig().
+ * This works well enough, though I have no idea why it was not working in the
+ * body.
+ */
+function checkCosmiconfResult(
+  ccResult: CosmiconfigResult
+): Promise<CosmiconfigResult> {
+  return new Promise((resolve, reject) => {
+    if (ccResult === null) {
+      return reject(
+        new ImpConfigureCosmiconfError("Could not find configuration object")
+      );
+    }
+
+    /* This check was added due to the api specification of cosmiconf, but
+     * actually "empty results" are already catched by the if-block above.
+     * TODO: Check when this condition may be true, remove when possible.
+     */
+    if (ccResult?.isEmpty === true) {
+      logger.debug("Cosmiconfig resolved to an empty configuration object...");
+      logger.debug(
+        `Cosmiconfig read this config file: "${ccResult?.filepath}"`
+      );
+      return reject(
+        new ImpConfigureCosmiconfError("Configuration object must not be empty")
+      );
+    }
+
+    logger.debug(`Read configuration from: "${ccResult?.filepath}"`);
+    return resolve(ccResult);
+  });
+}
+
+function normalizeConfig(configObject: any): Promise<ImpIntermediateConfig> {
+  return new Promise((resolve, _reject) => {
+    logger.debug(configObject);
+    return resolve({} as ImpIntermediateConfig);
+  });
+}
+
 export function getConfig(
   argv: string[],
   cmdLineOptions: Config
-): Promise<void> {
+): Promise<ImpConfig> {
   return new Promise((resolve, reject) => {
     /* Parse the command line arguments into actual usable parameters. */
     const cmdLineParams = getopt(cmdLineOptions, argv);
@@ -55,34 +123,10 @@ export function getConfig(
       cmdLineParams.configFile as string | boolean,
       cmdLineParams.debug as boolean
     )
-      .then((result) => {
-        if (result === null) {
-          return reject(
-            new ImpConfigureError("Could not find configuration object")
-          );
-        }
-
-        /* This check was added due to the api specification of cosmiconf, but
-         * actually "empty results" are already catched by the if-block above.
-         * TODO: Check when this condition may be true, remove when possible.
-         */
-        if (result?.isEmpty === true) {
-          logger.debug(
-            "Cosmiconfig resolved to an empty configuration object..."
-          );
-          logger.debug(
-            `Cosmiconfig read this config file: "${result?.filepath}"`
-          );
-          return reject(
-            new ImpConfigureError("Configuration object must not be empty")
-          );
-        }
-
-        logger.debug(`Read configuration from: "${result?.filepath}"`);
-        logger.debug(result?.config);
-        return resolve();
-      })
+      .then(checkCosmiconfResult)
       .catch((err) => {
+        if (err instanceof ImpConfigureCosmiconfError) return reject(err);
+
         /* Cosmiconf does not throw/reject custom errors, so the actual error
          * is "catched" and then re-thrown / re-rejected with an module-specific
          * error class and message.
@@ -94,6 +138,16 @@ export function getConfig(
             "Error during cosmiconf operation. Activate debug mode for details!"
           )
         );
+      })
+      .then((ccResult) => {
+        return normalizeConfig(ccResult);
+      })
+      .then((normalizedConfig) => {
+        logger.debug(normalizedConfig);
+        return resolve(normalizedConfig as ImpConfig);
+      })
+      .catch((err) => {
+        return reject(err);
       });
   });
 }
