@@ -39,8 +39,24 @@ export function main(argv: string[]): Promise<number> {
      * later during startup.
      * TODO: As of now, "-d" is hardcoded. Probably this should be made
      *       dependent of the actual configuration.
+     * FIXME: Ok, not longer hardcoded, but with a REAL ugly cast!
+     *        See node_modules/stdio/dist/getopt.d.ts
      */
-    if (argv.indexOf("-d") > -1) {
+    const debugKey =
+      (
+        cmdLineOptions?.debug as {
+          key?: string;
+          description?: string;
+          multiple?: boolean;
+          args?: string | number;
+          mandatory?: boolean;
+          required?: boolean;
+          default?: string | boolean | string[];
+          maxArgs?: number;
+          minArgs?: number;
+        }
+      )["key"] || "d";
+    if (argv.indexOf(`-${debugKey}`) > -1) {
       applyDebugConfiguration();
     }
 
