@@ -43,6 +43,43 @@ class ImpConfigureMissingParameterError extends ImpConfigureError {
   }
 }
 
+/* The followin object defines the accepted command line options as required
+ * by stdio.getopt().
+ * It is actually used by lib/configure getConfig() to parse the command line
+ * input.
+ */
+export const cmdLineOptions: Config = {
+  configFile: {
+    args: 1,
+    default: false,
+    description: "Specify the configuration file to be used",
+    key: "c",
+    required: false,
+  },
+  debug: {
+    args: 1,
+    default: false,
+    description: "Flag to activate debug mode",
+    key: "d",
+    required: false,
+  },
+  inputFile: {
+    args: "*",
+    default: false,
+    description: "The input file; may be specified multiple times",
+    key: "i",
+    multiple: true,
+    required: false,
+  },
+  outputDir: {
+    args: 1,
+    default: false,
+    description: "Directory to write processed files to",
+    key: "o",
+    required: false,
+  },
+};
+
 function cosmiconfigWrapper(
   configFile: string | boolean,
   clearCache: boolean
@@ -133,12 +170,13 @@ function mergeConfig(
   });
 }
 
-function normalizeConfig(configObjectInput: any): Promise<ImpIntermediateConfig> {
-
+function normalizeConfig(
+  configObjectInput: any
+): Promise<ImpIntermediateConfig> {
   const configObject = configObjectInput as ImpIntermediateConfig;
 
   return new Promise((resolve, reject) => {
-    const targets = (configObject.targets ) || undefined;
+    const targets = configObject.targets || undefined;
     if (targets === undefined)
       return reject(
         new ImpConfigureMissingParameterError(
@@ -174,10 +212,7 @@ function normalizeConfig(configObjectInput: any): Promise<ImpIntermediateConfig>
   });
 }
 
-export function getConfig(
-  argv: string[],
-  cmdLineOptions: Config
-): Promise<ImpConfig> {
+export function getConfig(argv: string[]): Promise<ImpConfig> {
   return new Promise((resolve, reject) => {
     /* Parse the command line arguments into actual usable parameters. */
     const cmdLineParams = getopt(cmdLineOptions, argv);
@@ -219,7 +254,6 @@ export function getConfig(
         return mergeConfig(normalizedConfig, cmdLineParams);
       })
       .then((mergedConfig) => {
-        logger.debug(mergedConfig);
         return resolve(mergedConfig);
       })
       .catch((err) => {
