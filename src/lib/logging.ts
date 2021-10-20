@@ -8,6 +8,7 @@ const debugLoggingConfiguration: ISettingsParam = {
   displayFunctionName: true,
   displayFilePath: "hideNodeModulesOnly",
   printLogMessageInNewLine: true,
+  suppressStdOutput: false,
 };
 
 const defaultLoggingConfiguration: ISettingsParam = {
@@ -25,4 +26,8 @@ export function applyDebugConfiguration(
 ): void {
   logger.setSettings(debugConf);
   logger.debug("Activated debug mode...");
+}
+
+export function suppressLogOutput(): void {
+  logger.setSettings({ suppressStdOutput: true });
 }

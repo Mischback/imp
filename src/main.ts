@@ -6,7 +6,11 @@ import { Config } from "stdio/dist/getopt";
 /* internal imports */
 import { cmdLineOptions, getConfig } from "./lib/configure";
 import { ImpConfigureError } from "./lib/errors";
-import { logger, applyDebugConfiguration } from "./lib/logging";
+import {
+  logger,
+  applyDebugConfiguration,
+  suppressLogOutput,
+} from "./lib/logging";
 
 /* *** INTERNAL CONSTANTS *** */
 const EXIT_SUCCESS = 0; // sysexits.h: 0 -> successful termination
@@ -28,11 +32,21 @@ export function main(argv: string[]): Promise<number> {
       return reject(EXIT_SIGINT);
     });
 
+    /* Activate the quiet mode as early as possible
+     * This is done without getopt() from stdio, because getopt() will be called
+     * later during startup.
+     * Please note: if quiet mode and debug mode are activated, debug mode wins.
+     */
+    const quietKey = (cmdLineOptions.quiet as StdioConfigItem)["key"];
+    if (argv.indexOf(`-${quietKey as string}`) > -1) {
+      suppressLogOutput();
+    }
+
     /* Activate the debug mode as early as possible
      * This is done without getopt() from stdio, because getopt() will be called
      * later during startup.
      */
-    const debugKey = (cmdLineOptions?.debug as StdioConfigItem)["key"] || "d";
+    const debugKey = (cmdLineOptions.debug as StdioConfigItem)["key"];
     if (argv.indexOf(`-${debugKey as string}`) > -1) {
       applyDebugConfiguration();
     }

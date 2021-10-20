@@ -57,7 +57,7 @@ export const cmdLineOptions: Config = {
     required: false,
   },
   debug: {
-    args: 1,
+    args: 0,
     default: false,
     description: "Flag to activate debug mode",
     key: "d",
@@ -76,6 +76,13 @@ export const cmdLineOptions: Config = {
     default: false,
     description: "Directory to write processed files to",
     key: "o",
+    required: false,
+  },
+  quiet: {
+    args: 0,
+    default: false,
+    description: "Disable all logging messages",
+    key: "q",
     required: false,
   },
 };
