@@ -7,7 +7,7 @@ import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 // INSERT LIB IMPORTS HERE!
 
 /* import the subject under test (SUT) */
-import { applyDebugConfiguration, logger } from "./logging";
+import { applyDebugConfiguration, logger, suppressLogOutput } from "./logging";
 
 /* additional imports */
 import { ISettingsParam } from "tslog";
@@ -35,6 +35,7 @@ describe("applyDebugConfiguration()...", () => {
       displayFunctionName: true,
       displayFilePath: "hideNodeModulesOnly",
       printLogMessageInNewLine: true,
+      suppressStdOutput: false,
     };
 
     /* setup mocks and spies */
@@ -67,5 +68,20 @@ describe("applyDebugConfiguration()...", () => {
     expect(spyLoggerSetSettings).toHaveBeenCalledTimes(1);
     expect(spyLoggerSetSettings).toHaveBeenCalledWith(testConfiguration);
     expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("suppressLogOutput()...", () => {
+  it("...applies the argument to suppress output", () => {
+    /* define the parameter */
+    const testConfiguration: ISettingsParam = { suppressStdOutput: true };
+
+    /* setup mocks and spies */
+    const spyLoggerSetSettings = jest.spyOn(logger, "setSettings");
+
+    /* make the assertions */
+    expect(suppressLogOutput()).toBe(undefined);
+    expect(spyLoggerSetSettings).toHaveBeenCalledTimes(1);
+    expect(spyLoggerSetSettings).toHaveBeenCalledWith(testConfiguration);
   });
 });
