@@ -21,10 +21,12 @@ const defaultLoggingConfiguration: ISettingsParam = {
 
 export const logger = new Logger(defaultLoggingConfiguration);
 
-export function applyDebugConfiguration(
-  debugConf: ISettingsParam = debugLoggingConfiguration
-): void {
-  logger.setSettings(debugConf);
+export function applyLoggingConfiguration(loggingConfig: ISettingsParam): void {
+  logger.setSettings(loggingConfig);
+}
+
+export function applyDebugConfiguration(): void {
+  applyLoggingConfiguration(debugLoggingConfiguration);
   logger.debug("Activated debug mode...");
 }
 

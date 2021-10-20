@@ -7,7 +7,12 @@ import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 // INSERT LIB IMPORTS HERE!
 
 /* import the subject under test (SUT) */
-import { applyDebugConfiguration, logger, suppressLogOutput } from "./logging";
+import {
+  applyDebugConfiguration,
+  applyLoggingConfiguration,
+  logger,
+  suppressLogOutput,
+} from "./logging";
 
 /* additional imports */
 import { ISettingsParam } from "tslog";
@@ -50,7 +55,9 @@ describe("applyDebugConfiguration()...", () => {
     );
     expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
   });
+});
 
+describe("applyLoggingConfiguration()...", () => {
   it("...applies the configuration as provided by parameter", () => {
     /* define the parameter */
     const testConfiguration: ISettingsParam = {
@@ -61,13 +68,11 @@ describe("applyDebugConfiguration()...", () => {
 
     /* setup mocks and spies */
     const spyLoggerSetSettings = jest.spyOn(logger, "setSettings");
-    const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    expect(applyDebugConfiguration(testConfiguration)).toBe(undefined);
+    expect(applyLoggingConfiguration(testConfiguration)).toBe(undefined);
     expect(spyLoggerSetSettings).toHaveBeenCalledTimes(1);
     expect(spyLoggerSetSettings).toHaveBeenCalledWith(testConfiguration);
-    expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
   });
 });
 
