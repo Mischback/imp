@@ -4,7 +4,7 @@
 import { cosmiconfig } from "cosmiconfig";
 import { CosmiconfigResult } from "cosmiconfig/dist/types";
 import { getopt } from "stdio";
-import { Config } from "stdio/dist/getopt";
+import { Config, GetoptResponse } from "stdio/dist/getopt";
 
 /* internal imports */
 import { ImpConfigureError } from "./errors";
@@ -32,6 +32,12 @@ interface ImpConfig {
 /* *** INTERNAL CONSTANTS *** */
 
 class ImpConfigureCosmiconfError extends ImpConfigureError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+class ImpConfigureMissingParameterError extends ImpConfigureError {
   constructor(message: string) {
     super(message);
   }
@@ -94,10 +100,77 @@ function checkCosmiconfResult(
   });
 }
 
-function normalizeConfig(configObject: any): Promise<ImpIntermediateConfig> {
-  return new Promise((resolve, _reject) => {
-    logger.debug(configObject);
-    return resolve({} as ImpIntermediateConfig);
+function mergeConfig(
+  configObject: ImpIntermediateConfig,
+  cmdLineParams: GetoptResponse
+): Promise<ImpConfig> {
+  return new Promise((resolve, reject) => {
+    const inputFiles =
+      cmdLineParams.inputFile || configObject.inputFiles || undefined;
+    if (inputFiles === undefined)
+      return reject(
+        new ImpConfigureMissingParameterError(
+          "Missing configuration value: inputFiles"
+        )
+      );
+
+    const outputDir =
+      cmdLineParams.outputDir || configObject.outputDir || undefined;
+    if (outputDir === undefined)
+      return reject(
+        new ImpConfigureMissingParameterError(
+          "Missing configuration value: outputDir"
+        )
+      );
+
+    return resolve({
+      inputFiles: inputFiles,
+      outputDir: outputDir,
+      targets: configObject.targets,
+      formatOptions: configObject.formatOptions,
+      loggingOptions: configObject.loggingOptions,
+    } as ImpConfig);
+  });
+}
+
+function normalizeConfig(configObjectInput: any): Promise<ImpIntermediateConfig> {
+
+  const configObject = configObjectInput as ImpIntermediateConfig;
+
+  return new Promise((resolve, reject) => {
+    const targets = (configObject.targets ) || undefined;
+    if (targets === undefined)
+      return reject(
+        new ImpConfigureMissingParameterError(
+          "Missing configuration value: targets"
+        )
+      );
+
+    const formatOptions = configObject.formatOptions || undefined;
+    if (formatOptions === undefined)
+      return reject(
+        new ImpConfigureMissingParameterError(
+          "Missing configuration value: formatOptions"
+        )
+      );
+
+    const inputFiles = configObject.inputFiles || undefined;
+    if (inputFiles === undefined)
+      logger.debug("inputFiles not specified in config object...");
+
+    const outputDir = configObject.outputDir || undefined;
+    if (outputDir === undefined)
+      logger.debug("outputDir not specified in config object...");
+
+    const loggingOptions = configObject.loggingOptions || undefined;
+
+    return resolve({
+      inputFiles: inputFiles,
+      outputDir: outputDir,
+      targets: targets,
+      formatOptions: formatOptions,
+      loggingOptions: loggingOptions,
+    } as ImpIntermediateConfig);
   });
 }
 
@@ -140,11 +213,14 @@ export function getConfig(
         );
       })
       .then((ccResult) => {
-        return normalizeConfig(ccResult);
+        return normalizeConfig(ccResult?.config);
       })
       .then((normalizedConfig) => {
-        logger.debug(normalizedConfig);
-        return resolve(normalizedConfig as ImpConfig);
+        return mergeConfig(normalizedConfig, cmdLineParams);
+      })
+      .then((mergedConfig) => {
+        logger.debug(mergedConfig);
+        return resolve(mergedConfig);
       })
       .catch((err) => {
         return reject(err);
