@@ -13,6 +13,7 @@ import { getopt } from "stdio";
 import { cmdLineOptions, getConfig } from "./configure";
 
 /* additional imports */
+import { CosmiconfigResult } from "cosmiconfig/dist/types";
 import { GetoptResponse } from "stdio/dist/getopt";
 import { ImpConfigureError } from "./errors";
 import { logger } from "./logging";
@@ -105,6 +106,68 @@ describe("cosmiconfigWrapper()...", () => {
       expect(mockCCSearch).toHaveBeenCalledTimes(1);
       expect(mockCCSearch).toHaveBeenCalledWith();
       expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+describe("checkCosmiconfResult()...", () => {
+  it("...rejects with an error, if cosmiconfig returns an empty result", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const mockCCLoad = jest.fn().mockReturnValue(Promise.resolve(null));
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: false,
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv).catch((err) => {
+      expect(err).toBeInstanceOf(ImpConfigureError);
+      expect(err.message).toBe("Could not find configuration object");
+      expect(cosmiconfig).toHaveBeenCalledTimes(1);
+      expect(cosmiconfig).toHaveBeenCalledWith("imp");
+      expect(mockCCLoad).toHaveBeenCalledTimes(1);
+      expect(mockCCLoad).toHaveBeenCalledWith(testConfigFile);
+      expect(spyLoggerDebug).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  it("...rejects with an error, if cosmiconfig returns an object with isEmpty", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const mockCCLoad = jest.fn().mockReturnValue(
+      Promise.resolve({
+        isEmpty: true,
+      } as CosmiconfigResult)
+    );
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: false,
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv).catch((err) => {
+      expect(err).toBeInstanceOf(ImpConfigureError);
+      expect(err.message).toBe("Configuration object must not be empty");
+      expect(cosmiconfig).toHaveBeenCalledTimes(1);
+      expect(cosmiconfig).toHaveBeenCalledWith("imp");
+      expect(mockCCLoad).toHaveBeenCalledTimes(1);
+      expect(mockCCLoad).toHaveBeenCalledWith(testConfigFile);
+      expect(spyLoggerDebug).toHaveBeenCalledTimes(2);
     });
   });
 });
