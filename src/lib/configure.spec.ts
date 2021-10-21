@@ -108,6 +108,39 @@ describe("cosmiconfigWrapper()...", () => {
       expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
     });
   });
+
+  it("...clears cosmiconfig's cache in debug mode", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const mockCCLoad = jest.fn().mockRejectedValue("foo");
+    const mockCCClearCaches = jest.fn();
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: true,
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+      clearCaches: mockCCClearCaches,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv).catch((err) => {
+      expect(err).toBeInstanceOf(ImpConfigureError);
+      expect(err.message).toBe(
+        "Error during cosmiconf operation. Activate debug mode for details!"
+      );
+      expect(cosmiconfig).toHaveBeenCalledTimes(1);
+      expect(cosmiconfig).toHaveBeenCalledWith("imp");
+      expect(mockCCLoad).toHaveBeenCalledTimes(1);
+      expect(mockCCLoad).toHaveBeenCalledWith(testConfigFile);
+      expect(mockCCClearCaches).toHaveBeenCalledTimes(1);
+      expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
+    });
+  });
 });
 
 describe("checkCosmiconfResult()...", () => {
