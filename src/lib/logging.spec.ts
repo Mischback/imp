@@ -15,7 +15,7 @@ import {
 } from "./logging";
 
 /* additional imports */
-import { ISettingsParam } from "tslog";
+import { ISettingsParam, ISettings } from "tslog";
 
 /* Run these before actually starting the test suite */
 beforeAll(() => {
@@ -44,7 +44,11 @@ describe("applyDebugConfiguration()...", () => {
     };
 
     /* setup mocks and spies */
-    const spyLoggerSetSettings = jest.spyOn(logger, "setSettings");
+    const spyLoggerSetSettings = jest
+      .spyOn(logger, "setSettings")
+      .mockImplementationOnce((_settings) => {
+        return {} as ISettings;
+      });
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
