@@ -21,7 +21,7 @@ interface ImpIntermediateConfig {
 }
 
 // FIXME: Apply correct type to targets/formatOptions
-interface ImpConfig {
+export interface ImpConfig {
   inputFiles: string[];
   outputDir: string;
   targets: string;

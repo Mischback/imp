@@ -131,10 +131,6 @@ describe("checkCosmiconfResult()...", () => {
     return getConfig(testArgv).catch((err) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Could not find configuration object");
-      // expect(cosmiconfig).toHaveBeenCalledTimes(1);
-      // expect(cosmiconfig).toHaveBeenCalledWith("imp");
-      // expect(mockCCLoad).toHaveBeenCalledTimes(1);
-      // expect(mockCCLoad).toHaveBeenCalledWith(testConfigFile);
       expect(spyLoggerDebug).toHaveBeenCalledTimes(0);
     });
   });
@@ -163,10 +159,6 @@ describe("checkCosmiconfResult()...", () => {
     return getConfig(testArgv).catch((err) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Configuration object must not be empty");
-      // expect(cosmiconfig).toHaveBeenCalledTimes(1);
-      // expect(cosmiconfig).toHaveBeenCalledWith("imp");
-      // expect(mockCCLoad).toHaveBeenCalledTimes(1);
-      // expect(mockCCLoad).toHaveBeenCalledWith(testConfigFile);
       expect(spyLoggerDebug).toHaveBeenCalledTimes(2);
     });
   });
@@ -197,10 +189,6 @@ describe("normalizeConfig()...", () => {
     return getConfig(testArgv).catch((err) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Missing configuration value: targets");
-      // expect(cosmiconfig).toHaveBeenCalledTimes(1);
-      // expect(cosmiconfig).toHaveBeenCalledWith("imp");
-      // expect(mockCCLoad).toHaveBeenCalledTimes(1);
-      // expect(mockCCLoad).toHaveBeenCalledWith(testConfigFile);
       expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
     });
   });
@@ -231,11 +219,242 @@ describe("normalizeConfig()...", () => {
     return getConfig(testArgv).catch((err) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Missing configuration value: formatOptions");
-      // expect(cosmiconfig).toHaveBeenCalledTimes(1);
-      // expect(cosmiconfig).toHaveBeenCalledWith("imp");
-      // expect(mockCCLoad).toHaveBeenCalledTimes(1);
-      // expect(mockCCLoad).toHaveBeenCalledWith(testConfigFile);
       expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
     });
+  });
+});
+
+describe("mergeConfig()...", () => {
+  it("...rejects with an error, if the inputFiles value is missing", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const mockCCLoad = jest.fn().mockReturnValue(
+      Promise.resolve({
+        config: {
+          targets: "foo",
+          formatOptions: "foo",
+        },
+      } as CosmiconfigResult)
+    );
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: false,
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv).catch((err) => {
+      expect(err).toBeInstanceOf(ImpConfigureError);
+      expect(err.message).toBe("Missing configuration value: inputFiles");
+      expect(spyLoggerDebug).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  it("...accepts inputFiles provided by command line", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const testInputByCmdLine = "testInputByCmdLine.jpg";
+    const mockCCLoad = jest.fn().mockReturnValue(
+      Promise.resolve({
+        config: {
+          targets: "foo",
+          formatOptions: "foo",
+        },
+      } as CosmiconfigResult)
+    );
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: false,
+      inputFile: [testInputByCmdLine],
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv).catch((err) => {
+      expect(err).toBeInstanceOf(ImpConfigureError);
+      expect(err.message).toBe("Missing configuration value: outputDir");
+      expect(spyLoggerDebug).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  it("...accepts inputFiles provided by configuration object", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const testInputByFile = "testInputByFile.jpg";
+    const mockCCLoad = jest.fn().mockReturnValue(
+      Promise.resolve({
+        config: {
+          targets: "foo",
+          formatOptions: "foo",
+          inputFiles: [testInputByFile],
+        },
+      } as CosmiconfigResult)
+    );
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: false,
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv).catch((err) => {
+      expect(err).toBeInstanceOf(ImpConfigureError);
+      expect(err.message).toBe("Missing configuration value: outputDir");
+      expect(spyLoggerDebug).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it("...accepts outputDir provided by command line", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const testInputByFile = "testInputByFile.jpg";
+    const testDirByCmdLine = "testDirByCmdLine";
+    const mockCCLoad = jest.fn().mockReturnValue(
+      Promise.resolve({
+        config: {
+          targets: "foo",
+          formatOptions: "foo",
+          inputFiles: [testInputByFile],
+        },
+      } as CosmiconfigResult)
+    );
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: false,
+      outputDir: testDirByCmdLine,
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv)
+      .then((retVal) => {
+        expect(retVal).toStrictEqual({
+          inputFiles: [testInputByFile],
+          outputDir: testDirByCmdLine,
+          targets: "foo",
+          formatOptions: "foo",
+          loggingOptions: undefined,
+        });
+        expect(spyLoggerDebug).toHaveBeenCalledTimes(2);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
+  });
+
+  it("...accepts outputDir provided by configuration object", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const testInputByFile = "testInputByFile.jpg";
+    const testDirByFile = "testDirByFile";
+    const mockCCLoad = jest.fn().mockReturnValue(
+      Promise.resolve({
+        config: {
+          targets: "foo",
+          formatOptions: "foo",
+          inputFiles: [testInputByFile],
+          outputDir: testDirByFile,
+        },
+      } as CosmiconfigResult)
+    );
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: false,
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv)
+      .then((retVal) => {
+        expect(retVal).toStrictEqual({
+          inputFiles: [testInputByFile],
+          outputDir: testDirByFile,
+          targets: "foo",
+          formatOptions: "foo",
+          loggingOptions: undefined,
+        });
+        expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
+      })
+      .catch((_err) => {
+        expect(1).toBe(2);
+      });
+  });
+
+  it("...overrides inputFiles / outputDir with command line parameters", () => {
+    /* define the parameter */
+    const testArgv = ["doesn't", "matter"];
+    const testConfigFile = "testConfigFile.json";
+    const testInputByFile = "testInputByFile.jpg";
+    const testInputByCmdLine = "testInputByCmdLine.jpg";
+    const testDirByFile = "testDirByFile";
+    const testDirByCmdLine = "testDirByCmdLine";
+    const mockCCLoad = jest.fn().mockReturnValue(
+      Promise.resolve({
+        config: {
+          targets: "foo",
+          formatOptions: "foo",
+          inputFiles: [testInputByFile],
+          outputDir: testDirByFile,
+        },
+      } as CosmiconfigResult)
+    );
+
+    /* setup mocks and spies */
+    (getopt as jest.Mock).mockReturnValue({
+      configFile: testConfigFile,
+      debug: false,
+      inputFile: [testInputByCmdLine],
+      outputDir: testDirByCmdLine,
+    } as GetoptResponse);
+    (cosmiconfig as jest.Mock).mockReturnValue({
+      load: mockCCLoad,
+    });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    return getConfig(testArgv)
+      .then((retVal) => {
+        expect(retVal).toStrictEqual({
+          inputFiles: [testInputByCmdLine],
+          outputDir: testDirByCmdLine,
+          targets: "foo",
+          formatOptions: "foo",
+          loggingOptions: undefined,
+        });
+        expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
+      })
+      .catch((_err) => {
+        expect(1).toBe(2);
+      });
   });
 });
