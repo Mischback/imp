@@ -7,7 +7,7 @@ import { getopt } from "stdio";
 import { Config, GetoptResponse } from "stdio/dist/getopt";
 
 /* internal imports */
-import { ImpConfigureError } from "./errors";
+import { ImpError } from "./errors";
 import { logger } from "./logging";
 
 /* *** TYPE DEFINITIONS *** */
@@ -30,6 +30,12 @@ export interface ImpConfig {
 }
 
 /* *** INTERNAL CONSTANTS *** */
+
+export class ImpConfigureError extends ImpError {
+  constructor(message: string) {
+    super(message);
+  }
+}
 
 class ImpConfigureCosmiconfError extends ImpConfigureError {
   constructor(message: string) {

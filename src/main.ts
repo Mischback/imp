@@ -4,8 +4,7 @@
 import { Config } from "stdio/dist/getopt";
 
 /* internal imports */
-import { cmdLineOptions, getConfig } from "./lib/configure";
-import { ImpConfigureError } from "./lib/errors";
+import { cmdLineOptions, getConfig, ImpConfigureError } from "./lib/configure";
 import {
   logger,
   applyDebugConfiguration,

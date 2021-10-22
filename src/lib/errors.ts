@@ -1,12 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-class ImpError extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-export class ImpConfigureError extends ImpError {
+export class ImpError extends Error {
   constructor(message: string) {
     super(message);
   }

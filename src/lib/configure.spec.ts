@@ -10,12 +10,11 @@ jest.mock("stdio");
 import { getopt } from "stdio";
 
 /* import the subject under test (SUT) */
-import { cmdLineOptions, getConfig } from "./configure";
+import { cmdLineOptions, getConfig, ImpConfigureError } from "./configure";
 
 /* additional imports */
 import { CosmiconfigResult } from "cosmiconfig/dist/types";
 import { GetoptResponse } from "stdio/dist/getopt";
-import { ImpConfigureError } from "./errors";
 import { logger } from "./logging";
 
 /* Run these before actually starting the test suite */
@@ -104,7 +103,6 @@ describe("cosmiconfigWrapper()...", () => {
       expect(cosmiconfig).toHaveBeenCalledTimes(1);
       expect(cosmiconfig).toHaveBeenCalledWith("imp");
       expect(mockCCSearch).toHaveBeenCalledTimes(1);
-      expect(mockCCSearch).toHaveBeenCalledWith();
       expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
     });
   });
