@@ -5,27 +5,81 @@ import { cosmiconfig } from "cosmiconfig";
 import { CosmiconfigResult } from "cosmiconfig/dist/types";
 import { getopt } from "stdio";
 import { Config, GetoptResponse } from "stdio/dist/getopt";
+import type {
+  AvifOptions,
+  GifOptions,
+  HeifOptions,
+  JpegOptions,
+  PngOptions,
+  TiffOptions,
+  WebpOptions,
+  OutputOptions,
+} from "sharp";
 
 /* internal imports */
 import { ImpError } from "./errors";
 import { logger } from "./logging";
 
 /* *** TYPE DEFINITIONS *** */
-// FIXME: Apply correct type to targets/formatOptions
+
+export type TargetFormat =
+  | "avif"
+  | "gif"
+  | "heif"
+  | "jpeg"
+  | "png"
+  | "tiff"
+  | "webp";
+
+interface TargetItemDoNotScale {
+  mode: "do-not-scale";
+  filenameSuffix: string;
+  formats: TargetFormat[];
+}
+
+interface TargetItemKeepAspect {
+  mode: "keep-aspect";
+  filenameSuffix: string;
+  formats: TargetFormat[];
+  width: number;
+}
+
+interface TargetItemKeepAspect {
+  mode: "keep-aspect";
+  filenameSuffix: string;
+  formats: TargetFormat[];
+  height: number;
+}
+
+export interface TargetConfig {
+  [key: string]: TargetItemDoNotScale | TargetItemKeepAspect;
+}
+
+export interface FormatConfig {
+  [key: string]:
+    | OutputOptions
+    | AvifOptions
+    | GifOptions
+    | HeifOptions
+    | JpegOptions
+    | PngOptions
+    | TiffOptions
+    | WebpOptions;
+}
+
 interface ImpIntermediateConfig {
   inputFiles?: string[];
   outputDir?: string;
-  targets: string;
-  formatOptions: string;
+  targets: TargetConfig;
+  formatOptions: FormatConfig;
   loggingOptions?: string;
 }
 
-// FIXME: Apply correct type to targets/formatOptions
 export interface ImpConfig {
   inputFiles: string[];
   outputDir: string;
-  targets: string;
-  formatOptions: string;
+  targets: TargetConfig;
+  formatOptions: FormatConfig;
   loggingOptions?: string;
 }
 

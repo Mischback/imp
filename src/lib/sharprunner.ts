@@ -4,7 +4,7 @@
 import sharp = require("sharp");
 
 /* internal imports */
-import { ImpConfig } from "./configure";
+import { FormatConfig, ImpConfig, TargetConfig } from "./configure";
 import { ImpError } from "./errors";
 import { logger } from "./logging";
 
@@ -27,8 +27,8 @@ class SharpRunnerProcessError extends SharpRunnerError {
 export class SharpRunner {
   _inputFile: string;
   _outputDir: string;
-  _targets: string;
-  _formatOptions: string;
+  _targets: TargetConfig;
+  _formatOptions: FormatConfig;
 
   __sharpPipeEntry: sharp.Sharp | undefined;
 
