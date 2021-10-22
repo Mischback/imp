@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@types/jest": "^27.0.2",
+    "@types/sharp": "0.29.2",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",
@@ -14,6 +15,7 @@
   },
   "dependencies": {
     "cosmiconfig": "7.0.1",
+    "sharp": "0.29.2",
     "stdio": "2.1.1",
     "tslog": "3.2.2"
   }
