@@ -76,10 +76,15 @@ export class SharpRunner {
   process(): Promise<number> {
     return new Promise((resolve, reject) => {
       this._buildPipes()
+        .then((sharpPipes) => {
+          return this._processPipes(sharpPipes);
+        })
         .then(() => {
           return resolve(0);
         })
         .catch((err) => {
+          if (err instanceof SharpRunnerError) return reject(err);
+
           logger.debug(err);
           return reject(
             new SharpRunnerProcessError(
@@ -151,6 +156,13 @@ export class SharpRunner {
     logger.debug(`Built pipe for "${newFilename}"`);
 
     return pipe;
+  }
+
+  _processPipes(sharpPipes: sharp.Sharp[]): Promise<number> {
+    return new Promise((resolve, _reject) => {
+      logger.debug(sharpPipes);
+      return resolve(0);
+    });
   }
 
   /**
