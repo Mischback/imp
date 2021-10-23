@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: MIT
 
 /* library imports */
-import { basename, extname } from "path";
+import { basename, extname, join } from "path";
 import sharp = require("sharp");
 
 /* internal imports */
-import { FormatConfig, ImpConfig, TargetConfig, TargetFormat } from "./configure";
+import {
+  FormatConfig,
+  ImpConfig,
+  TargetConfig,
+  TargetFormat,
+} from "./configure";
 import { ImpError } from "./errors";
 import { logger } from "./logging";
 
@@ -24,6 +29,23 @@ class SharpRunnerProcessError extends SharpRunnerError {
     super(message);
   }
 }
+
+class SharpRunnerCreatePipeError extends SharpRunnerError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+const TargetFormatExtensions: { [index: string]: string } = {
+  avif: ".avif",
+  gif: ".gif",
+  heif: ".heif",
+  jpeg: ".jpg",
+  jpg: ".jpg",
+  png: ".png",
+  tiff: ".tiff",
+  webp: ".webp",
+};
 
 export class SharpRunner {
   _inputFile: string;
@@ -75,16 +97,18 @@ export class SharpRunner {
       Object.keys(this._targets).forEach((targetKey) => {
         const target = this._targets[targetKey];
 
-        const newFileBasename = target?.filenameSuffix ? this._fileBasename + target?.filenameSuffix : this._fileBasename;
+        const newFileBasename = target?.filenameSuffix
+          ? this._fileBasename + target?.filenameSuffix
+          : this._fileBasename;
 
         target?.formats.forEach((targetFormat) => {
           try {
-            sharpPipes.push(
-              this._createPipe(newFileBasename, targetFormat)
-            );
+            sharpPipes.push(this._createPipe(newFileBasename, targetFormat));
           } catch (err) {
             logger.debug(err);
-            logger.warn(`Found an unknown target format: "${targetKey}". Skipping!`);
+            logger.warn(
+              `Found an unknown target format: "${targetKey}". Skipping!`
+            );
           }
         });
       });
@@ -95,11 +119,36 @@ export class SharpRunner {
   }
 
   _createPipe(fileBasename: string, targetFormat: TargetFormat): sharp.Sharp {
+    let targetSharpFormat: keyof sharp.FormatEnum;
+    if (targetFormat in sharp.format) {
+      targetSharpFormat = targetFormat as keyof sharp.FormatEnum;
+    } else {
+      throw new SharpRunnerCreatePipeError("");
+    }
 
-    const pipe = this._sharpPipeEntry.clone();
+    const newFilename = `${fileBasename}${
+      TargetFormatExtensions[targetFormat] as string
+    }`;
 
-    logger.debug(fileBasename);
-    logger.debug(targetFormat);
+    const targetFormatOptions = this._formatOptions[targetFormat]
+      ? this._formatOptions[targetFormat]
+      : {};
+
+    let pipe = this._sharpPipeEntry.clone();
+
+    // pipe = pipe.resize({ width: 200 });
+
+    pipe = pipe.toFormat(targetSharpFormat, targetFormatOptions);
+
+    // The following line is ignored from TypeScript's and eslint's checks,
+    // because they find, that the Promise is not fully populated. Indeed, it
+    // will be fully populated, but TypeScript can not determine this, because
+    // the call to "toFormat()" is performed with a variable filetype.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    pipe = pipe.toFile(join(this._outputDir, newFilename));
+
+    logger.debug(`Built pipe for "${newFilename}"`);
 
     return pipe;
   }
