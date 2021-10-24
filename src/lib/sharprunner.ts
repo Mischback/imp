@@ -255,11 +255,23 @@ export class SharpRunner {
   }
 }
 
-export function processImageList(inputFiles: string[]): Promise<void> {
-  return new Promise((resolve, _reject) => {
-    inputFiles.forEach((inputFile: string) => {
-      logger.debug(inputFile);
+export function processImageList(configObject: ImpConfig): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const imageList: Promise<number>[] = [];
+
+    logger.debug(configObject);
+
+    configObject.inputFiles.forEach((inputFile: string) => {
+      imageList.push(new SharpRunner(inputFile, configObject).process());
     });
-    return resolve();
+
+    Promise.all(imageList)
+      .then((retVals) => {
+        logger.debug(retVals);
+        return resolve(retVals.reduce((a, b) => a + b, 0));
+      })
+      .catch((err) => {
+        return reject(err);
+      });
   });
 }
