@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 /* library imports */
+import { createReadStream } from "fs";
 import { basename, extname, join } from "path";
 import sharp = require("sharp");
 
@@ -92,8 +93,8 @@ export class SharpRunner {
         .then((sharpPipes) => {
           return this._processPipes(sharpPipes);
         })
-        .then(() => {
-          return resolve(0);
+        .then((numberOfProcessedPipes) => {
+          return resolve(numberOfProcessedPipes);
         })
         .catch((err) => {
           if (err instanceof SharpRunnerError) return reject(err);
@@ -198,9 +199,39 @@ export class SharpRunner {
   }
 
   _processPipes(sharpPipes: sharp.Sharp[]): Promise<number> {
-    return new Promise((resolve, _reject) => {
-      logger.debug(sharpPipes);
-      return resolve(0);
+    return new Promise((resolve, reject) => {
+      if (sharpPipes.length === 0) {
+        logger.warn("There are no pipes to process. Aborting!");
+        return reject(new SharpRunnerProcessError("No pipes to process"));
+      }
+
+      const stream = createReadStream(this._inputFile);
+
+      stream.on("open", () => {
+        logger.debug(`Piping "${this._inputFile}" into the sharp pipes...`);
+        stream.pipe(this._sharpPipeEntry);
+      });
+
+      stream.on("error", (err) => {
+        logger.debug(err);
+        return reject(
+          new SharpRunnerProcessError(
+            `Error while reading "${this._inputFile}"`
+          )
+        );
+      });
+
+      Promise.all(sharpPipes)
+        .then(() => {
+          logger.debug("Completed processing all pipes. Resolving!");
+          return resolve(sharpPipes.length);
+        })
+        .catch((err) => {
+          logger.debug(err);
+          return reject(
+            new SharpRunnerProcessError("Error while processing the pipes")
+          );
+        });
     });
   }
 

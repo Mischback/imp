@@ -15,3 +15,7 @@ node_modules
 
 # don't track the modules configuration file
 .imprc.json
+
+# it's actually embarassing, but I *do* manual testing. But this should not go
+# upstream. (;
+.manual-test
