@@ -102,9 +102,10 @@ export class SharpRunner {
       Object.keys(this._targets).forEach((targetKey) => {
         const target = this._targets[targetKey];
 
-        const newFileBasename = target?.filenameSuffix
-          ? this._fileBasename + target?.filenameSuffix
-          : this._fileBasename;
+        const newFileBasename =
+          target?.filenameSuffix !== undefined
+            ? this._fileBasename + target?.filenameSuffix
+            : this._fileBasename;
 
         target?.formats.forEach((targetFormat) => {
           try {
