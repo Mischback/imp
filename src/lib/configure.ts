@@ -211,8 +211,8 @@ function mergeConfig(
   cmdLineParams: GetoptResponse
 ): Promise<ImpConfig> {
   return new Promise((resolve, reject) => {
-    const inputFiles =
-      cmdLineParams.inputFile || configObject.inputFiles || undefined;
+    let inputFiles =
+      cmdLineParams.inputFile ?? configObject.inputFiles ?? undefined;
     if (inputFiles === undefined)
       return reject(
         new ImpConfigureMissingParameterError(
@@ -220,8 +220,10 @@ function mergeConfig(
         )
       );
 
+    if (typeof inputFiles === "string") inputFiles = [inputFiles];
+
     const outputDir =
-      cmdLineParams.outputDir || configObject.outputDir || undefined;
+      cmdLineParams.outputDir ?? configObject.outputDir ?? undefined;
     if (outputDir === undefined)
       return reject(
         new ImpConfigureMissingParameterError(
