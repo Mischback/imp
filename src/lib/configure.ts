@@ -51,8 +51,10 @@ interface TargetItemKeepAspect {
   height: number;
 }
 
+export type TargetConfigItem = TargetItemDoNotScale | TargetItemKeepAspect;
+
 export interface TargetConfig {
-  [key: string]: TargetItemDoNotScale | TargetItemKeepAspect;
+  [key: string]: TargetConfigItem;
 }
 
 export interface FormatConfig {

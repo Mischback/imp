@@ -9,6 +9,7 @@ import {
   FormatConfig,
   ImpConfig,
   TargetConfig,
+  TargetConfigItem,
   TargetFormat,
 } from "./configure";
 import { ImpError } from "./errors";
@@ -31,6 +32,18 @@ class SharpRunnerProcessError extends SharpRunnerError {
 }
 
 class SharpRunnerCreatePipeError extends SharpRunnerError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+class SharpRunnerCreatePipeFormatError extends SharpRunnerCreatePipeError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+class SharpRunnerCreatePipeModeError extends SharpRunnerCreatePipeError {
   constructor(message: string) {
     super(message);
   }
@@ -96,25 +109,24 @@ export class SharpRunner {
   }
 
   _buildPipes(): Promise<sharp.Sharp[]> {
-    return new Promise((resolve, _reject) => {
+    return new Promise((resolve, reject) => {
       const sharpPipes: sharp.Sharp[] = [];
 
       Object.keys(this._targets).forEach((targetKey) => {
         const target = this._targets[targetKey];
 
-        const newFileBasename =
-          target?.filenameSuffix !== undefined
-            ? this._fileBasename + target?.filenameSuffix
-            : this._fileBasename;
-
         target?.formats.forEach((targetFormat) => {
           try {
-            sharpPipes.push(this._createPipe(newFileBasename, targetFormat));
+            sharpPipes.push(this._createPipe(target, targetFormat));
           } catch (err) {
-            logger.debug(err);
-            logger.warn(
-              `Found an unknown target format: "${targetKey}". Skipping!`
-            );
+            if (err instanceof SharpRunnerCreatePipeFormatError) {
+              logger.debug(err);
+              logger.warn(
+                `Found an unknown target format: "${targetFormat}". Skipping!`
+              );
+            } else {
+              return reject(err);
+            }
           }
         });
       });
@@ -124,25 +136,51 @@ export class SharpRunner {
     });
   }
 
-  _createPipe(fileBasename: string, targetFormat: TargetFormat): sharp.Sharp {
+  _createPipe(
+    target: TargetConfigItem,
+    targetFormat: TargetFormat
+  ): sharp.Sharp {
     let targetSharpFormat: keyof sharp.FormatEnum;
     if (targetFormat in sharp.format) {
       targetSharpFormat = targetFormat as keyof sharp.FormatEnum;
     } else {
-      throw new SharpRunnerCreatePipeError("");
+      throw new SharpRunnerCreatePipeFormatError(
+        `Unknown target format "${targetFormat}"`
+      );
     }
+
+    const fileBasename =
+      target?.filenameSuffix !== undefined
+        ? this._fileBasename + target?.filenameSuffix
+        : this._fileBasename;
 
     const newFilename = `${fileBasename}${
       TargetFormatExtensions[targetFormat] as string
     }`;
 
-    const targetFormatOptions = this._formatOptions[targetFormat]
-      ? this._formatOptions[targetFormat]
-      : {};
+    const targetFormatOptions =
+      this._formatOptions[targetFormat] !== undefined
+        ? this._formatOptions[targetFormat]
+        : {};
 
     let pipe = this._sharpPipeEntry.clone();
 
-    // pipe = pipe.resize({ width: 200 });
+    switch (target.mode) {
+      case "do-not-scale":
+        break;
+      case "keep-aspect":
+        if (target.width !== undefined) {
+          pipe = pipe.resize({ width: target.width });
+        } else if (target.height !== undefined) {
+          pipe = pipe.resize({ height: target.height });
+        } else
+          throw new SharpRunnerCreatePipeModeError(
+            'Mode "keep-aspect" requires either "width" or "height" to be specified'
+          );
+        break;
+      default:
+        throw new SharpRunnerCreatePipeModeError("Unknown target mode");
+    }
 
     pipe = pipe.toFormat(targetSharpFormat, targetFormatOptions);
 
