@@ -23,7 +23,7 @@ const EXIT_SIGINT = 130; // bash scripting guide: 130 -> terminated by ctrl-c
 /* *** TYPE DEFINITIONS *** */
 type StdioConfigItem = Exclude<Config, boolean | undefined>;
 
-export function main(argv: string[]): Promise<number> {
+export function impMain(argv: string[]): Promise<number> {
   return new Promise((resolve, reject) => {
     /* Setting up a handler for SIGINT (Ctrl-C)
      * This handler may be useful for cleaning up before terminating the script.

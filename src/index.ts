@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 /* internal imports */
-import { main } from "./main";
+import { impMain } from "./main";
 
-main(process.argv)
+impMain(process.argv)
   .then((retVal) => {
     process.exit(retVal);
   })
