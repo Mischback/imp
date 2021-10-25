@@ -23,6 +23,11 @@ import { logger } from "./logging";
 
 /* *** TYPE DEFINITIONS *** */
 
+/**
+ * These are the accepted values for target formats.
+ * They are synchronized with Sharp's accepted values aswell as the list of
+ * file extensions @constant sharprunner.TargetFormatExtensions
+ */
 export type TargetFormat =
   | "avif"
   | "gif"
@@ -32,12 +37,21 @@ export type TargetFormat =
   | "tiff"
   | "webp";
 
+/**
+ * A TargetConfigItem that does not apply any scaling to the source image.
+ * @see TargetConfigItem
+ */
 interface TargetItemDoNotScale {
   mode: "do-not-scale";
   filenameSuffix: string;
   formats: TargetFormat[];
 }
 
+/**
+ * A TargetConfigItem that applies scaling, relative to the width of the source
+ * image.
+ * @see TargetConfigItem
+ */
 interface TargetItemKeepAspect {
   mode: "keep-aspect";
   filenameSuffix: string;
@@ -45,6 +59,11 @@ interface TargetItemKeepAspect {
   width: number;
 }
 
+/**
+ * A TargetConfigItem that applies scaling, relative to the height of the source
+ * image.
+ * @see TargetConfigItem
+ */
 interface TargetItemKeepAspect {
   mode: "keep-aspect";
   filenameSuffix: string;
@@ -52,12 +71,33 @@ interface TargetItemKeepAspect {
   height: number;
 }
 
+/**
+ * One item of a target configuration
+ * @see TargetConfig
+ */
 export type TargetConfigItem = TargetItemDoNotScale | TargetItemKeepAspect;
 
+/**
+ * The target configuration is a dictionary of TargetConfigItems with a string
+ * used as key.
+ * @see TargetConfigItem
+ */
 export interface TargetConfig {
   [key: string]: TargetConfigItem;
 }
 
+/**
+ * The format configuration is dictionary of Sharp's output options with a
+ * string used as key.
+ * @see OutputOptions
+ * @see AvifOptions
+ * @see GifOptions
+ * @see HeifOptions
+ * @see JpegOptions
+ * @see PngOptions
+ * @see TiffOptions
+ * @see WebpOptions
+ */
 export interface FormatConfig {
   [key: string]:
     | OutputOptions
@@ -70,6 +110,14 @@ export interface FormatConfig {
     | WebpOptions;
 }
 
+/**
+ * An intermediate configuration object, that does not yet enforce the presence
+ * of certain values.
+ * @see ImpConfig
+ * @see TargetConfig
+ * @see FormatConfig
+ * @see ISettingsParam
+ */
 interface ImpIntermediateConfig {
   inputFiles?: string[];
   outputDir?: string;
@@ -78,6 +126,12 @@ interface ImpIntermediateConfig {
   loggingOptions?: ISettingsParam;
 }
 
+/**
+ * The actual configuration object to proceed operation.
+ * @see TargetConfig
+ * @see FormatConfig
+ * @see ISettingsParam
+ */
 export interface ImpConfig {
   inputFiles: string[];
   outputDir: string;
@@ -106,10 +160,11 @@ class ImpConfigureMissingParameterError extends ImpConfigureError {
   }
 }
 
-/* The followin object defines the accepted command line options as required
+/**
+ * This constant defines the accepted command line options as required
  * by stdio.getopt().
- * It is actually used by lib/configure getConfig() to parse the command line
- * input.
+ * @see getopt
+ * @see getConfig
  */
 export const cmdLineOptions: Config = {
   configFile: {
@@ -150,6 +205,22 @@ export const cmdLineOptions: Config = {
   },
 };
 
+/**
+ * Small wrapper around Cosmiconfig to provide a unified interface for loading
+ * a specified configuration file aswell as having Cosmiconfig searching for
+ * the configuration file.
+ * Additionally, this function ensures, that Cosmiconfig's cache is cleared
+ * while running in debug mode.
+ *
+ * @param configFile - A path/filename to a config file to be loaded or false
+ *                     to look for a configuration using Cosmiconfig's search().
+ * @param clearCache - A flag to indicate, if Cosmiconfig's cache should be
+ *                     cleared.
+ * @returns - A Promise resolving to a CosmiconfigResult
+ *
+ * @see CosmiconfigResult
+ * @see cosmiconfig
+ */
 function cosmiconfigWrapper(
   configFile: string | boolean,
   clearCache: boolean
@@ -168,15 +239,15 @@ function cosmiconfigWrapper(
 /**
  * Check the results of Cosmiconfig and handle possible return states.
  *
+ * @param ccResult - The CosmiconfigResult as returned by cosmiconfigWrapper
+ * @returns - A Promise resolving to a CosmiconfigResult
+ *
  * Because Cosmiconfig will actually *resolve* with empty return values, that
  * are not usable for this module, these return values have to be handled in
  * a special way.
- * Parsing and consequently rejecting in the body of getConfig() raised all
- * types of (I guess TypeScript-specific) typing problems, thus, this function
- * performs the required checks, rejects with its own error type, which is
- * handled in getConfig().
- * This works well enough, though I have no idea why it was not working in the
- * body.
+ *
+ * @see cosmiconfigWrapper
+ * @see CosmiconfigResult
  */
 function checkCosmiconfResult(
   ccResult: CosmiconfigResult
@@ -207,6 +278,26 @@ function checkCosmiconfResult(
   });
 }
 
+/**
+ * Merge command line parameters with options read from configuration file.
+ *
+ * @param configObject {ImpIntermediateConfig} - These options are read from a
+ *                                               configuration file by
+ *                                               Cosmiconfig
+ * @param cmdLineParams {GetoptResponse} - These options are read/parsed from
+ *                                         the command line by getopt()
+ * @returns - A Promise, resolving to an actual ImpConfig
+ *
+ * Mandatory values are the list of input files, the output directory and the
+ * target configuration.
+ * If getopt() was called with a single input file (which then will be provided
+ * as string), it is wrapped inside a list, to match the type declaration and
+ * enable further processing.
+ *
+ * @see ImpIntermediateConfig
+ * @see GetoptResponse
+ * @see ImpConfig
+ */
 function mergeConfig(
   configObject: ImpIntermediateConfig,
   cmdLineParams: GetoptResponse
@@ -242,6 +333,20 @@ function mergeConfig(
   });
 }
 
+/**
+ * Convert the result of Cosmiconfig into an ImpIntermediateConfig.
+ *
+ * @param configObjectInput - The configuration options as determined by using
+ *                            Cosmiconfig
+ * @returns - A Promise, resolving to a ImpIntermediateConfig object
+ *
+ * Basically this function casts the received value into the required target
+ * type.
+ * Additionally, all other required values are at least initialized. The
+ * presence of a target configuration is enforced.
+ *
+ * @see ImpIntermediateConfig
+ */
 function normalizeConfig(
   configObjectInput: any
 ): Promise<ImpIntermediateConfig> {
@@ -282,6 +387,16 @@ function normalizeConfig(
   });
 }
 
+/**
+ * Determine the configuration for processing.
+ *
+ * @param argv - The argument vector which was used to call the module
+ * @returns - A Promise, resolving to an instance of ImpConfig
+ *
+ * @see ImpConfig
+ * @see getopt
+ * @see cosmiconfig
+ */
 export function getConfig(argv: string[]): Promise<ImpConfig> {
   return new Promise((resolve, reject) => {
     /* Parse the command line arguments into actual usable parameters. */
