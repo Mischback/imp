@@ -6,14 +6,16 @@ import { mocked } from "ts-jest/utils";
 
 /* mock library imports */
 jest.mock("sharp");
+jest.mock("path");
 
 /* import the subject under test (SUT) */
 import { SharpRunner } from "./sharprunner";
 
 /* additional imports */
+import { basename, join } from "path";
 import sharp = require("sharp");
 import { logger } from "./logging";
-import { ImpConfig } from "./configure";
+import { ImpConfig, TargetConfigItem } from "./configure";
 
 /* Run these before actually starting the test suite */
 beforeAll(() => {
@@ -30,6 +32,7 @@ describe("SharpRunner.constructor()...", () => {
   it("...correctly stores configuration values and initialises the state", () => {
     /* define the parameter */
     const testInputFile = "testInputFile.jpg";
+    const testBasename = "testBasename";
     const testConfig: ImpConfig = {
       inputFiles: [testInputFile],
       outputDir: "testdir",
@@ -44,6 +47,7 @@ describe("SharpRunner.constructor()...", () => {
     };
 
     /* setup mocks and spies */
+    (basename as jest.Mock).mockReturnValue(testBasename);
 
     /* make the assertions */
     const runner = new SharpRunner(testInputFile, testConfig);
@@ -52,7 +56,7 @@ describe("SharpRunner.constructor()...", () => {
     expect(runner._targets).toBe(testConfig.targets);
     expect(runner._formatOptions).toStrictEqual({});
     expect(runner.__sharpPipeEntry).toBe(undefined);
-    expect(runner._fileBasename).toBe("testInputFile");
+    expect(runner._fileBasename).toBe(testBasename);
   });
 });
 
@@ -87,7 +91,7 @@ describe("SharpRunner._buildPipes()...", () => {
     });
   });
 
-  it("...resolves with a list of sharp.Sharp instances", () => {
+  it("...resolves with a list of pipes for a single target", () => {
     /* define the parameter */
     const testInputFile = "testInputFile.jpg";
     const testConfig: ImpConfig = {
@@ -119,7 +123,7 @@ describe("SharpRunner._buildPipes()...", () => {
       });
   });
 
-  it("...correclty resolves with a list of sharp.Sharp instances for multiple targets", () => {
+  it("...correclty resolves with a list of pipes for multiple targets", () => {
     /* define the parameter */
     const testInputFile = "testInputFile.jpg";
     const testConfig: ImpConfig = {
@@ -156,7 +160,7 @@ describe("SharpRunner._buildPipes()...", () => {
       });
   });
 
-  it("...correclty resolves with a list of sharp.Sharp instances for multiple target formats", () => {
+  it("...correclty resolves with a list of pipes for multiple target formats", () => {
     /* define the parameter */
     const testInputFile = "testInputFile.jpg";
     const testConfig: ImpConfig = {
@@ -188,7 +192,7 @@ describe("SharpRunner._buildPipes()...", () => {
       });
   });
 
-  it("...correclty resolves with a list of sharp.Sharp instances for multiple targets with multiple target formats", () => {
+  it("...correclty resolves with a list of pipes for multiple targets with multiple target formats", () => {
     /* define the parameter */
     const testInputFile = "testInputFile.jpg";
     const testConfig: ImpConfig = {
@@ -261,6 +265,305 @@ describe("SharpRunner._buildPipes()...", () => {
       .catch(() => {
         expect(1).toBe(2);
       });
+  });
+});
+
+describe("SharpRunner._createPipe()...", () => {
+  it("...throws an error if the target format is not supported", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          // TypeScript and eslint correctly prohibit this, but it may be
+          // specified in the config file. Enforce this test!
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          formats: ["pngs"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+
+    /* make the assertions */
+    // TypeScript and eslint correctly prohibit this, but it may be
+    // specified in the config file. Enforce this test!
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    expect(() => runner._createPipe(testConfig.targets.full, "pngs")).toThrow();
+  });
+
+  it("...correctly applies pipes for mode 'do-not-scale'", () => {
+    /* define the parameter */
+    const testJoin = "testJoin";
+    const testFormat = "png";
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const mockedToFile = jest.fn().mockReturnValue("foobar");
+    const mockedToFormat = jest.fn(() => {
+      return {
+        toFile: mockedToFile,
+      };
+    });
+    const mockedSharpPipeEntry = {
+      clone: jest.fn(() => {
+        return {
+          toFormat: mockedToFormat,
+        };
+      }),
+    };
+    Object.defineProperty(runner, "_sharpPipeEntry", {
+      value: mockedSharpPipeEntry,
+    });
+    (join as jest.Mock).mockReturnValue(testJoin);
+
+    /* make the assertions */
+    const retVal = runner._createPipe(
+      testConfig.targets.full as TargetConfigItem,
+      testFormat
+    );
+    expect(retVal).toBe("foobar");
+    expect(mockedToFile).toHaveBeenCalledTimes(1);
+    expect(mockedToFile).toHaveBeenCalledWith(testJoin);
+    expect(mockedToFormat).toHaveBeenCalledTimes(1);
+    expect(mockedToFormat).toHaveBeenCalledWith(testFormat, {});
+  });
+
+  it("...correctly applies pipes for mode 'keep-aspect' with specified 'width'", () => {
+    /* define the parameter */
+    const testJoin = "testJoin";
+    const testFormat = "png";
+    const testDimension = 1337;
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        small: {
+          mode: "keep-aspect",
+          filenameSuffix: "",
+          formats: ["png"],
+          width: testDimension,
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const mockedToFile = jest.fn().mockReturnValue("foobar");
+    const mockedToFormat = jest.fn().mockReturnValue({
+      toFile: mockedToFile,
+    });
+    const mockedResize = jest.fn().mockReturnValue({
+      toFormat: mockedToFormat,
+    });
+    const mockedSharpPipeEntry = {
+      clone: jest.fn(() => {
+        return {
+          resize: mockedResize,
+        };
+      }),
+    };
+    Object.defineProperty(runner, "_sharpPipeEntry", {
+      value: mockedSharpPipeEntry,
+    });
+    (join as jest.Mock).mockReturnValue(testJoin);
+
+    /* make the assertions */
+    const retVal = runner._createPipe(
+      testConfig.targets.small as TargetConfigItem,
+      testFormat
+    );
+    expect(retVal).toBe("foobar");
+    expect(mockedToFile).toHaveBeenCalledTimes(1);
+    expect(mockedToFile).toHaveBeenCalledWith(testJoin);
+    expect(mockedToFormat).toHaveBeenCalledTimes(1);
+    expect(mockedToFormat).toHaveBeenCalledWith(testFormat, {});
+    expect(mockedResize).toHaveBeenCalledTimes(1);
+    expect(mockedResize).toHaveBeenCalledWith({ width: testDimension });
+  });
+
+  it("...correctly applies pipes for mode 'keep-aspect' with specified 'height'", () => {
+    /* define the parameter */
+    const testJoin = "testJoin";
+    const testFormat = "png";
+    const testDimension = 1337;
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        small: {
+          mode: "keep-aspect",
+          filenameSuffix: "",
+          formats: ["png"],
+          height: testDimension,
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const mockedToFile = jest.fn().mockReturnValue("foobar");
+    const mockedToFormat = jest.fn().mockReturnValue({
+      toFile: mockedToFile,
+    });
+    const mockedResize = jest.fn().mockReturnValue({
+      toFormat: mockedToFormat,
+    });
+    const mockedSharpPipeEntry = {
+      clone: jest.fn(() => {
+        return {
+          resize: mockedResize,
+        };
+      }),
+    };
+    Object.defineProperty(runner, "_sharpPipeEntry", {
+      value: mockedSharpPipeEntry,
+    });
+    (join as jest.Mock).mockReturnValue(testJoin);
+
+    /* make the assertions */
+    const retVal = runner._createPipe(
+      testConfig.targets.small as TargetConfigItem,
+      testFormat
+    );
+    expect(retVal).toBe("foobar");
+    expect(mockedToFile).toHaveBeenCalledTimes(1);
+    expect(mockedToFile).toHaveBeenCalledWith(testJoin);
+    expect(mockedToFormat).toHaveBeenCalledTimes(1);
+    expect(mockedToFormat).toHaveBeenCalledWith(testFormat, {});
+    expect(mockedResize).toHaveBeenCalledTimes(1);
+    expect(mockedResize).toHaveBeenCalledWith({ height: testDimension });
+  });
+
+  it("...throws an error if the mode 'keep-aspect' is used without 'width'/'height'", () => {
+    /* define the parameter */
+    const testJoin = "testJoin";
+    const testFormat = "png";
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        small: {
+          mode: "keep-aspect",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const mockedToFile = jest.fn().mockReturnValue("foobar");
+    const mockedToFormat = jest.fn().mockReturnValue({
+      toFile: mockedToFile,
+    });
+    const mockedResize = jest.fn().mockReturnValue({
+      toFormat: mockedToFormat,
+    });
+    const mockedSharpPipeEntry = {
+      clone: jest.fn(() => {
+        return {
+          resize: mockedResize,
+        };
+      }),
+    };
+    Object.defineProperty(runner, "_sharpPipeEntry", {
+      value: mockedSharpPipeEntry,
+    });
+    (join as jest.Mock).mockReturnValue(testJoin);
+
+    /* make the assertions */
+    expect(() =>
+      runner._createPipe(
+        testConfig.targets.small as TargetConfigItem,
+        testFormat
+      )
+    ).toThrow();
+  });
+
+  it("...throws an error if called with an unknown 'mode'", () => {
+    /* define the parameter */
+    const testJoin = "testJoin";
+    const testFormat = "png";
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        small: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          mode: "unknownmode",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const mockedToFile = jest.fn().mockReturnValue("foobar");
+    const mockedToFormat = jest.fn().mockReturnValue({
+      toFile: mockedToFile,
+    });
+    const mockedResize = jest.fn().mockReturnValue({
+      toFormat: mockedToFormat,
+    });
+    const mockedSharpPipeEntry = {
+      clone: jest.fn(() => {
+        return {
+          resize: mockedResize,
+        };
+      }),
+    };
+    Object.defineProperty(runner, "_sharpPipeEntry", {
+      value: mockedSharpPipeEntry,
+    });
+    (join as jest.Mock).mockReturnValue(testJoin);
+
+    /* make the assertions */
+    expect(() =>
+      runner._createPipe(
+        testConfig.targets.small as TargetConfigItem,
+        testFormat
+      )
+    ).toThrow();
   });
 });
 
