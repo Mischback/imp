@@ -259,8 +259,6 @@ export function processImageList(configObject: ImpConfig): Promise<number> {
   return new Promise((resolve, reject) => {
     const imageList: Promise<number>[] = [];
 
-    logger.debug(configObject);
-
     configObject.inputFiles.forEach((inputFile: string) => {
       imageList.push(new SharpRunner(inputFile, configObject).process());
     });

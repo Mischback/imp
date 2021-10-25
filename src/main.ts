@@ -10,9 +10,11 @@ import {
   applyDebugConfiguration,
   suppressLogOutput,
 } from "./lib/logging";
+import { processImageList, SharpRunnerError } from "./lib/sharprunner";
 
 /* *** INTERNAL CONSTANTS *** */
 const EXIT_SUCCESS = 0; // sysexits.h: 0 -> successful termination
+const EXIT_DATA_ERROR = 65; // sysexits.h: 65 -> input data was incorrect in some way
 const EXIT_INTERNAL_ERROR = 70; // sysexits.h: 70 -> internal software error
 const EXIT_CONFIG_ERROR = 78; // sysexits.h: 78 -> configuration error
 const EXIT_SIGINT = 130; // bash scripting guide: 130 -> terminated by ctrl-c
@@ -53,7 +55,10 @@ export function main(argv: string[]): Promise<number> {
     /* The actual payload starts here */
     getConfig(argv)
       .then((configObject) => {
-        logger.debug(configObject);
+        return processImageList(configObject);
+      })
+      .then((retVal) => {
+        logger.info(`Processed ${retVal} pipes!`);
         return resolve(EXIT_SUCCESS);
       })
       .catch((err) => {
@@ -62,6 +67,12 @@ export function main(argv: string[]): Promise<number> {
           logger.error(err.message);
           logger.fatal("Could not determine configuration for ImP!");
           return reject(EXIT_CONFIG_ERROR);
+        }
+
+        if (err instanceof SharpRunnerError) {
+          logger.error(err.message);
+          logger.fatal("Could not process images!");
+          return reject(EXIT_DATA_ERROR);
         }
 
         /* general error handler */
