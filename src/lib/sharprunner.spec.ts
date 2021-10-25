@@ -10,7 +10,7 @@ jest.mock("path");
 jest.mock("sharp");
 
 /* import the subject under test (SUT) */
-import { SharpRunner } from "./sharprunner";
+import { SharpRunner, SharpRunnerError } from "./sharprunner";
 
 /* additional imports */
 import { createReadStream } from "fs";
@@ -666,6 +666,152 @@ describe("SharpRunner._processPipes()...", () => {
       .catch(() => {
         expect(1).toBe(2);
       });
+  });
+});
+
+describe("SharpRunner.process()...", () => {
+  it("...correctly rejects when encountering an error in _buildPipes()", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const buildPipesSpy = jest
+      .spyOn(runner, "_buildPipes")
+      .mockImplementation(() => {
+        return Promise.reject(new SharpRunnerError("foobar"));
+      });
+
+    /* make the assertions */
+    return runner.process().catch((err) => {
+      expect(err).toBeInstanceOf(SharpRunnerError);
+      expect(buildPipesSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("...correctly rejects when encountering an error in _processPipes()", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const buildPipesSpy = jest
+      .spyOn(runner, "_buildPipes")
+      .mockImplementation(() => {
+        return Promise.resolve([]);
+      });
+    const processPipesSpy = jest
+      .spyOn(runner, "_processPipes")
+      .mockImplementation(() => {
+        return Promise.reject(new SharpRunnerError("foobar"));
+      });
+
+    /* make the assertions */
+    return runner.process().catch((err) => {
+      expect(err).toBeInstanceOf(SharpRunnerError);
+      expect(buildPipesSpy).toHaveBeenCalledTimes(1);
+      expect(processPipesSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("...resolves with the number of processed pipes", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const buildPipesSpy = jest
+      .spyOn(runner, "_buildPipes")
+      .mockImplementation(() => {
+        return Promise.resolve([]);
+      });
+    const processPipesSpy = jest
+      .spyOn(runner, "_processPipes")
+      .mockImplementation(() => {
+        return Promise.resolve(1337);
+      });
+
+    /* make the assertions */
+    return runner
+      .process()
+      .then((retVal) => {
+        expect(retVal).toBe(1337);
+        expect(buildPipesSpy).toHaveBeenCalledTimes(1);
+        expect(processPipesSpy).toHaveBeenCalledTimes(1);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
+  });
+
+  it("...catches unexpected errors and re-raises them", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const buildPipesSpy = jest
+      .spyOn(runner, "_buildPipes")
+      .mockImplementation(() => {
+        return Promise.reject(new Error("foobar"));
+      });
+
+    /* make the assertions */
+    return runner.process().catch((err) => {
+      expect(err).toBeInstanceOf(SharpRunnerError);
+      expect(err.message).toBe(
+        `Unexpected error while processing ${testInputFile}`
+      );
+      expect(buildPipesSpy).toHaveBeenCalledTimes(1);
+    });
   });
 });
 
