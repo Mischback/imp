@@ -23,6 +23,16 @@ const EXIT_SIGINT = 130; // bash scripting guide: 130 -> terminated by ctrl-c
 /* *** TYPE DEFINITIONS *** */
 type StdioConfigItem = Exclude<Config, boolean | undefined>;
 
+/**
+ * The module's main function. It controls the general flow of execution.
+ *
+ * @param argv - The argument vector as a list of strings
+ * @returns - A Promise, resolving to a number, representing an exit code
+ *
+ * @see getConfig
+ * @see SharpRunner
+ * @see processImageList
+ */
 export function impMain(argv: string[]): Promise<number> {
   return new Promise((resolve, reject) => {
     /* Setting up a handler for SIGINT (Ctrl-C)
