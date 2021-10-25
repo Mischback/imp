@@ -10,7 +10,7 @@ jest.mock("path");
 jest.mock("sharp");
 
 /* import the subject under test (SUT) */
-import { SharpRunner, SharpRunnerError } from "./sharprunner";
+import { processImageList, SharpRunner, SharpRunnerError } from "./sharprunner";
 
 /* additional imports */
 import { createReadStream } from "fs";
@@ -877,5 +877,69 @@ describe("SharpRunner._sharpPipeEntry", () => {
 
     expect(pipeEntry).toStrictEqual(pipeEntry2);
     expect(sharp).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("processImageList()...", () => {
+  it("...catches unexpected errors and re-raises them", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const mockProcess = jest.fn(() => {
+      return Promise.reject("foo");
+    });
+    SharpRunner.prototype.process = mockProcess;
+
+    /* make the assertions */
+    return processImageList(testConfig).catch((err) => {
+      expect(err).toBe("foo");
+      expect(mockProcess).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("...correctly resolves with the total number of processed pipes", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile, "foo.jpg"],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const mockProcess = jest.fn(() => {
+      return Promise.resolve(1337);
+    });
+    SharpRunner.prototype.process = mockProcess;
+
+    /* make the assertions */
+    return processImageList(testConfig)
+      .then((retVal) => {
+        expect(retVal).toBe(1337 * 2);
+        expect(mockProcess).toHaveBeenCalledTimes(2);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
   });
 });
