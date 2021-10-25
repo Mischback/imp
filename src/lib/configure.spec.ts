@@ -223,36 +223,6 @@ describe("normalizeConfig()...", () => {
       expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
     });
   });
-
-  it("...rejects with an error, if the formatOptions value is missing", () => {
-    /* define the parameter */
-    const testArgv = ["doesn't", "matter"];
-    const testConfigFile = "testConfigFile.json";
-    const mockCCLoad = jest.fn().mockReturnValue(
-      Promise.resolve({
-        config: {
-          targets: "foo",
-        },
-      } as CosmiconfigResult)
-    );
-
-    /* setup mocks and spies */
-    (getopt as jest.Mock).mockReturnValue({
-      configFile: testConfigFile,
-      debug: false,
-    } as GetoptResponse);
-    (cosmiconfig as jest.Mock).mockReturnValue({
-      load: mockCCLoad,
-    });
-    const spyLoggerDebug = jest.spyOn(logger, "debug");
-
-    /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
-      expect(err).toBeInstanceOf(ImpConfigureError);
-      expect(err.message).toBe("Missing configuration value: formatOptions");
-      expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
-    });
-  });
 });
 
 describe("mergeConfig()...", () => {

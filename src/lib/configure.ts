@@ -73,7 +73,7 @@ interface ImpIntermediateConfig {
   inputFiles?: string[];
   outputDir?: string;
   targets: TargetConfig;
-  formatOptions: FormatConfig;
+  formatOptions?: FormatConfig;
   loggingOptions?: string;
 }
 
@@ -247,7 +247,7 @@ function normalizeConfig(
   const configObject = configObjectInput as ImpIntermediateConfig;
 
   return new Promise((resolve, reject) => {
-    const targets = configObject.targets || undefined;
+    const targets = configObject.targets ?? undefined;
     if (targets === undefined)
       return reject(
         new ImpConfigureMissingParameterError(
@@ -255,23 +255,21 @@ function normalizeConfig(
         )
       );
 
-    const formatOptions = configObject.formatOptions || undefined;
-    if (formatOptions === undefined)
-      return reject(
-        new ImpConfigureMissingParameterError(
-          "Missing configuration value: formatOptions"
-        )
-      );
+    /* formatOptions are not mandatory.
+     * The SharpRunner will actually just use sharp's default options, if no
+     * format options are applied
+     */
+    const formatOptions = configObject.formatOptions ?? {};
 
-    const inputFiles = configObject.inputFiles || undefined;
+    const inputFiles = configObject.inputFiles ?? undefined;
     if (inputFiles === undefined)
       logger.debug("inputFiles not specified in config object...");
 
-    const outputDir = configObject.outputDir || undefined;
+    const outputDir = configObject.outputDir ?? undefined;
     if (outputDir === undefined)
       logger.debug("outputDir not specified in config object...");
 
-    const loggingOptions = configObject.loggingOptions || undefined;
+    const loggingOptions = configObject.loggingOptions ?? undefined;
 
     return resolve({
       inputFiles: inputFiles,
