@@ -9,6 +9,7 @@ import {
   logger,
   applyDebugConfiguration,
   suppressLogOutput,
+  applyUserConfiguration,
 } from "./lib/logging";
 import { processImageList, SharpRunnerError } from "./lib/sharprunner";
 
@@ -47,13 +48,22 @@ export function main(argv: string[]): Promise<number> {
      * This is done without getopt() from stdio, because getopt() will be called
      * later during startup.
      */
+    let debugMode = false;
     const debugKey = (cmdLineOptions.debug as StdioConfigItem)["key"];
     if (argv.indexOf(`-${debugKey as string}`) > -1) {
       applyDebugConfiguration();
+      debugMode = true;
     }
 
     /* The actual payload starts here */
     getConfig(argv)
+      .then((configObject) => {
+        if (configObject.loggingOptions !== undefined) {
+          applyUserConfiguration(configObject.loggingOptions, debugMode);
+        }
+
+        return Promise.resolve(configObject);
+      })
       .then((configObject) => {
         return processImageList(configObject);
       })

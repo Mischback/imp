@@ -15,6 +15,7 @@ import type {
   WebpOptions,
   OutputOptions,
 } from "sharp";
+import { ISettingsParam } from "tslog";
 
 /* internal imports */
 import { ImpError } from "./errors";
@@ -74,7 +75,7 @@ interface ImpIntermediateConfig {
   outputDir?: string;
   targets: TargetConfig;
   formatOptions?: FormatConfig;
-  loggingOptions?: string;
+  loggingOptions?: ISettingsParam;
 }
 
 export interface ImpConfig {
@@ -82,7 +83,7 @@ export interface ImpConfig {
   outputDir: string;
   targets: TargetConfig;
   formatOptions: FormatConfig;
-  loggingOptions?: string;
+  loggingOptions?: ISettingsParam;
 }
 
 /* *** INTERNAL CONSTANTS *** */

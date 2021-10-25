@@ -30,6 +30,27 @@ export function applyDebugConfiguration(): void {
   logger.debug("Activated debug mode...");
 }
 
+export function applyUserConfiguration(
+  loggingConfig: ISettingsParam,
+  debug: boolean
+): void {
+  resetLoggingConfiguration();
+  applyLoggingConfiguration(loggingConfig);
+
+  if (debug === true) logger.setSettings({ minLevel: "debug" });
+}
+
+function resetLoggingConfiguration(): void {
+  logger.setSettings({
+    displayFunctionName: true,
+    displayLoggerName: true,
+    displayFilePath: "hideNodeModulesOnly",
+    minLevel: "silly",
+    printLogMessageInNewLine: false,
+    suppressStdOutput: false,
+  });
+}
+
 export function suppressLogOutput(): void {
   logger.setSettings({ suppressStdOutput: true });
 }
