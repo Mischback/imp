@@ -10,6 +10,7 @@ import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 import {
   applyDebugConfiguration,
   applyLoggingConfiguration,
+  applyUserConfiguration,
   logger,
   suppressLogOutput,
 } from "./logging";
@@ -77,6 +78,62 @@ describe("applyLoggingConfiguration()...", () => {
     expect(applyLoggingConfiguration(testConfiguration)).toBe(undefined);
     expect(spyLoggerSetSettings).toHaveBeenCalledTimes(1);
     expect(spyLoggerSetSettings).toHaveBeenCalledWith(testConfiguration);
+  });
+});
+
+describe("applyUserConfiguration()...", () => {
+  it("...applies the provided user config", () => {
+    /* This is actually the provided logging configuration for the debug mode.
+     * It is copy/pasted from "logging.ts", because it is not exported. However,
+     * this means that this test will fail, if/when this default config is
+     * modified.
+     */
+    const testConfiguration: ISettingsParam = {
+      name: "TESTCASE",
+      minLevel: "error",
+      printLogMessageInNewLine: false,
+    };
+
+    /* setup mocks and spies */
+    const spyLoggerSetSettings = jest
+      .spyOn(logger, "setSettings")
+      .mockImplementationOnce((_settings) => {
+        return {} as ISettings;
+      });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    expect(applyUserConfiguration(testConfiguration, false)).toBe(undefined);
+    expect(spyLoggerSetSettings).toHaveBeenCalledTimes(2);
+    expect(spyLoggerSetSettings).toHaveBeenCalledWith(testConfiguration);
+    expect(spyLoggerDebug).toHaveBeenCalledTimes(0);
+  });
+
+  it("...applies the provided user config and keeps debugMode", () => {
+    /* This is actually the provided logging configuration for the debug mode.
+     * It is copy/pasted from "logging.ts", because it is not exported. However,
+     * this means that this test will fail, if/when this default config is
+     * modified.
+     */
+    const testConfiguration: ISettingsParam = {
+      name: "TESTCASE",
+      minLevel: "error",
+      printLogMessageInNewLine: false,
+    };
+
+    /* setup mocks and spies */
+    const spyLoggerSetSettings = jest
+      .spyOn(logger, "setSettings")
+      .mockImplementationOnce((_settings) => {
+        return {} as ISettings;
+      });
+    const spyLoggerDebug = jest.spyOn(logger, "debug");
+
+    /* make the assertions */
+    expect(applyUserConfiguration(testConfiguration, true)).toBe(undefined);
+    expect(spyLoggerSetSettings).toHaveBeenCalledTimes(3);
+    expect(spyLoggerSetSettings).toHaveBeenCalledWith(testConfiguration);
+    expect(spyLoggerDebug).toHaveBeenCalledTimes(0);
   });
 });
 
