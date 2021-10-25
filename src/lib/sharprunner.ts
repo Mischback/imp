@@ -16,8 +16,6 @@ import {
 import { ImpError } from "./errors";
 import { logger } from "./logging";
 
-/* *** TYPE DEFINITIONS *** */
-
 /* *** INTERNAL CONSTANTS *** */
 
 export class SharpRunnerError extends ImpError {
@@ -50,6 +48,11 @@ class SharpRunnerCreatePipeModeError extends SharpRunnerCreatePipeError {
   }
 }
 
+/**
+ * Provides the actual file extensions for Sharp's accepted output formats.
+ *
+ * @see TargetFormat
+ */
 const TargetFormatExtensions: { [index: string]: string } = {
   avif: ".avif",
   gif: ".gif",
@@ -61,6 +64,10 @@ const TargetFormatExtensions: { [index: string]: string } = {
   webp: ".webp",
 };
 
+/**
+ * This class is the core of the module. It provides all necessary means to
+ * process one input file into one or several output files.
+ */
 export class SharpRunner {
   _inputFile: string;
   _outputDir: string;
@@ -70,6 +77,16 @@ export class SharpRunner {
   __sharpPipeEntry: sharp.Sharp | undefined;
   _fileBasename: string;
 
+  /**
+   * Create a new instance of SharpRunner.
+   *
+   * @param inputFile - Path/filename of the file to process
+   * @param config - An instance of ImpConfig
+   * @returns - An instance of SharpRunner
+   *
+   * The constructor will split the provided ImpConfig instance into its parts
+   * and setup the internal state of the object.
+   */
   constructor(inputFile: string, config: ImpConfig) {
     this._inputFile = inputFile;
     this._outputDir = config.outputDir;
@@ -109,6 +126,18 @@ export class SharpRunner {
     });
   }
 
+  /**
+   * Build the required pipes as specified by targets.
+   *
+   * @returns - A Promise, resolving to a list of sharp.Sharp instances
+   *
+   * The actual pipes are built by _createPipe(). This method basically loops
+   * through the targets: TargetConfig and pushes every result of _createPipe()
+   * into a list of sharpPipes: sharp.Sharp[].
+   *
+   * @see _createPipe
+   * @see TargetConfig
+   */
   _buildPipes(): Promise<sharp.Sharp[]> {
     return new Promise((resolve, reject) => {
       const sharpPipes: sharp.Sharp[] = [];
@@ -137,6 +166,17 @@ export class SharpRunner {
     });
   }
 
+  /**
+   * Create a single pipe as instance of sharp.Sharp.
+   *
+   * @param target - An instance of TargetConfigItem
+   * @param targetFormat - The format for the output file
+   * @returns - An instance of sharp.Sharp
+   *
+   * @see _buildPipes
+   * @see TargetConfigItem
+   * @see TargetFormat
+   */
   _createPipe(
     target: TargetConfigItem,
     targetFormat: TargetFormat
@@ -198,6 +238,16 @@ export class SharpRunner {
     return pipe;
   }
 
+  /**
+   * Process the pipes by piping the input file into the prepared pipes.
+   *
+   * @param sharpPipes - A list of sharp.Sharp instances to process
+   * @returns - A Promise, resolving to the number of processed pipes / created
+   *            output files
+   *
+   * @see _buildPipes
+   * @see _createPipe
+   */
   _processPipes(sharpPipes: sharp.Sharp[]): Promise<number> {
     return new Promise((resolve, reject) => {
       if (sharpPipes.length === 0) {
@@ -255,6 +305,15 @@ export class SharpRunner {
   }
 }
 
+/**
+ * Process a list of input files by creating instances of SharpRunner.
+ *
+ * @param configObject - An instance of ImpConfig
+ * @returns - A Promise, resolving to the total number of processed pipes
+ *
+ * @see SharpRunner
+ * @see ImpConfig
+ */
 export function processImageList(configObject: ImpConfig): Promise<number> {
   return new Promise((resolve, reject) => {
     const imageList: Promise<number>[] = [];
