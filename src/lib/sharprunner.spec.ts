@@ -5,13 +5,15 @@ import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { mocked } from "ts-jest/utils";
 
 /* mock library imports */
-jest.mock("sharp");
+jest.mock("fs");
 jest.mock("path");
+jest.mock("sharp");
 
 /* import the subject under test (SUT) */
 import { SharpRunner } from "./sharprunner";
 
 /* additional imports */
+import { createReadStream } from "fs";
 import { basename, join } from "path";
 import sharp = require("sharp");
 import { logger } from "./logging";
@@ -564,6 +566,106 @@ describe("SharpRunner._createPipe()...", () => {
         testFormat
       )
     ).toThrow();
+  });
+});
+
+describe("SharpRunner._processPipes()...", () => {
+  it("...rejects if called with an empty list of pipes", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+
+    /* make the assertions */
+    return runner._processPipes([]).catch((err) => {
+      expect(err.message).toBe("No pipes to process");
+    });
+  });
+
+  it("...rejects if one of the pipes fail to resolve", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+    const testPromise: Promise<void> = new Promise((_, reject) => {
+      return reject();
+    });
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const mockStreamOn = jest.fn();
+    (createReadStream as jest.Mock).mockReturnValue({
+      on: mockStreamOn,
+    });
+
+    /* make the assertions */
+    return runner
+      ._processPipes([testPromise as unknown as sharp.Sharp])
+      .catch((err) => {
+        expect(err.message).toBe("Error while processing the pipes");
+        expect(mockStreamOn).toHaveBeenCalledTimes(2);
+      });
+  });
+
+  it("...resolves with the number of processed pipes", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+    const testPromise: Promise<void> = new Promise((resolve) => {
+      return resolve();
+    });
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const mockStreamOn = jest.fn();
+    (createReadStream as jest.Mock).mockReturnValue({
+      on: mockStreamOn,
+    });
+
+    /* make the assertions */
+    return runner
+      ._processPipes([testPromise as unknown as sharp.Sharp])
+      .then((retVal) => {
+        expect(retVal).toBe(1);
+        expect(mockStreamOn).toHaveBeenCalledTimes(2);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
   });
 });
 
