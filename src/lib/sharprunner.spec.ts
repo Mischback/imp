@@ -56,6 +56,214 @@ describe("SharpRunner.constructor()...", () => {
   });
 });
 
+describe("SharpRunner._buildPipes()...", () => {
+  it("...rejects, if _createPipe() throws an error", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const createPipeSpy = jest.spyOn(runner, "_createPipe");
+    createPipeSpy.mockImplementation(() => {
+      throw new Error("testError");
+    });
+
+    /* make the assertions */
+    return runner._buildPipes().catch((err) => {
+      expect(err.message).toBe("testError");
+      expect(createPipeSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("...resolves with a list of sharp.Sharp instances", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const createPipeSpy = jest.spyOn(runner, "_createPipe");
+    createPipeSpy.mockReturnValue({} as sharp.Sharp);
+
+    /* make the assertions */
+    return runner
+      ._buildPipes()
+      .then((retVal) => {
+        expect(retVal.length).toBe(1);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
+  });
+
+  it("...correclty resolves with a list of sharp.Sharp instances for multiple targets", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+        small: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const createPipeSpy = jest.spyOn(runner, "_createPipe");
+    createPipeSpy.mockReturnValue({} as sharp.Sharp);
+
+    /* make the assertions */
+    return runner
+      ._buildPipes()
+      .then((retVal) => {
+        expect(retVal.length).toBe(2);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
+  });
+
+  it("...correclty resolves with a list of sharp.Sharp instances for multiple target formats", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png", "gif"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const createPipeSpy = jest.spyOn(runner, "_createPipe");
+    createPipeSpy.mockReturnValue({} as sharp.Sharp);
+
+    /* make the assertions */
+    return runner
+      ._buildPipes()
+      .then((retVal) => {
+        expect(retVal.length).toBe(2);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
+  });
+
+  it("...correclty resolves with a list of sharp.Sharp instances for multiple targets with multiple target formats", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png"],
+        },
+        small: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          formats: ["png", "gif"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const createPipeSpy = jest.spyOn(runner, "_createPipe");
+    createPipeSpy.mockReturnValue({} as sharp.Sharp);
+
+    /* make the assertions */
+    return runner
+      ._buildPipes()
+      .then((retVal) => {
+        expect(retVal.length).toBe(3);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
+  });
+
+  it("...issues a warning, if the target format is not supported", () => {
+    /* define the parameter */
+    const testInputFile = "testInputFile.jpg";
+    const testConfig: ImpConfig = {
+      inputFiles: [testInputFile],
+      outputDir: "testdir",
+      targets: {
+        full: {
+          mode: "do-not-scale",
+          filenameSuffix: "",
+          // TypeScript and eslint correctly prohibit this, but it may be
+          // specified in the config file. Enforce this test!
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          formats: ["pngs"],
+        },
+      },
+      formatOptions: {},
+    };
+
+    /* setup mocks and spies */
+    const runner = new SharpRunner(testInputFile, testConfig);
+    const createPipeSpy = jest.spyOn(runner, "_createPipe");
+    const loggerWarnSpy = jest.spyOn(logger, "warn");
+
+    /* make the assertions */
+    return runner
+      ._buildPipes()
+      .then((retVal) => {
+        expect(retVal.length).toBe(0);
+        expect(createPipeSpy).toHaveBeenCalledTimes(1);
+        expect(loggerWarnSpy).toHaveBeenCalledTimes(1);
+      })
+      .catch(() => {
+        expect(1).toBe(2);
+      });
+  });
+});
+
 describe("SharpRunner._sharpPipeEntry", () => {
   it("...initialises a sharp.Sharp instance on first call", () => {
     /* define the parameter */
