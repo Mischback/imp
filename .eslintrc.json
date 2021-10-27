@@ -8,11 +8,6 @@
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier"
   ],
-  "ignorePatterns": [
-    "dist",
-    "node_modules",
-    "src/**/*.spec.ts"
-  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": ["./tsconfig.json"]
