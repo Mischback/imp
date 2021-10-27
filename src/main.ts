@@ -81,7 +81,7 @@ export function impMain(argv: string[]): Promise<number> {
         logger.info(`Processed ${retVal} pipes!`);
         return resolve(EXIT_SUCCESS);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         /* handle "known" errors */
         if (err instanceof ImpConfigureError) {
           logger.error(err.message);

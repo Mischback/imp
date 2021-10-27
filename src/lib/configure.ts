@@ -348,9 +348,9 @@ function mergeConfig(
  * @see ImpIntermediateConfig
  */
 function normalizeConfig(
-  configObjectInput: any
+  configObjectInput: ImpIntermediateConfig
 ): Promise<ImpIntermediateConfig> {
-  const configObject = configObjectInput as ImpIntermediateConfig;
+  const configObject = configObjectInput;
 
   return new Promise((resolve, reject) => {
     const targets = configObject.targets ?? undefined;
@@ -417,7 +417,7 @@ export function getConfig(argv: string[]): Promise<ImpConfig> {
       cmdLineParams.debug as boolean
     )
       .then(checkCosmiconfResult)
-      .catch((err) => {
+      .catch((err: Error) => {
         if (err instanceof ImpConfigureCosmiconfError) return reject(err);
 
         /* Cosmiconf does not throw/reject custom errors, so the actual error
@@ -433,7 +433,7 @@ export function getConfig(argv: string[]): Promise<ImpConfig> {
         );
       })
       .then((ccResult) => {
-        return normalizeConfig(ccResult?.config);
+        return normalizeConfig(ccResult?.config as ImpIntermediateConfig);
       })
       .then((normalizedConfig) => {
         return mergeConfig(normalizedConfig, cmdLineParams);
@@ -441,7 +441,7 @@ export function getConfig(argv: string[]): Promise<ImpConfig> {
       .then((mergedConfig) => {
         return resolve(mergedConfig);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         return reject(err);
       });
   });

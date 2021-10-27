@@ -38,7 +38,7 @@ describe("getConfig()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Could not parse command line parameters");
       expect(getopt).toHaveBeenCalledTimes(1);
@@ -66,7 +66,7 @@ describe("cosmiconfigWrapper()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe(
         "Error during cosmiconf operation. Activate debug mode for details!"
@@ -95,7 +95,7 @@ describe("cosmiconfigWrapper()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe(
         "Error during cosmiconf operation. Activate debug mode for details!"
@@ -126,7 +126,7 @@ describe("cosmiconfigWrapper()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe(
         "Error during cosmiconf operation. Activate debug mode for details!"
@@ -159,7 +159,7 @@ describe("checkCosmiconfResult()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Could not find configuration object");
       expect(spyLoggerDebug).toHaveBeenCalledTimes(0);
@@ -187,7 +187,7 @@ describe("checkCosmiconfResult()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Configuration object must not be empty");
       expect(spyLoggerDebug).toHaveBeenCalledTimes(2);
@@ -217,7 +217,7 @@ describe("normalizeConfig()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Missing configuration value: targets");
       expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
@@ -263,7 +263,7 @@ describe("normalizeConfig()...", () => {
         });
         expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
       })
-      .catch((_err) => {
+      .catch(() => {
         expect(1).toBe(2);
       });
   });
@@ -307,7 +307,7 @@ describe("normalizeConfig()...", () => {
         });
         expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
       })
-      .catch((_err) => {
+      .catch(() => {
         expect(1).toBe(2);
       });
   });
@@ -337,7 +337,7 @@ describe("mergeConfig()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Missing configuration value: inputFiles");
       expect(spyLoggerDebug).toHaveBeenCalledTimes(3);
@@ -369,7 +369,7 @@ describe("mergeConfig()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Missing configuration value: outputDir");
       expect(spyLoggerDebug).toHaveBeenCalledTimes(3);
@@ -401,7 +401,7 @@ describe("mergeConfig()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Missing configuration value: outputDir");
       expect(spyLoggerDebug).toHaveBeenCalledTimes(3);
@@ -433,7 +433,7 @@ describe("mergeConfig()...", () => {
     const spyLoggerDebug = jest.spyOn(logger, "debug");
 
     /* make the assertions */
-    return getConfig(testArgv).catch((err) => {
+    return getConfig(testArgv).catch((err: Error) => {
       expect(err).toBeInstanceOf(ImpConfigureError);
       expect(err.message).toBe("Missing configuration value: outputDir");
       expect(spyLoggerDebug).toHaveBeenCalledTimes(2);
@@ -521,7 +521,7 @@ describe("mergeConfig()...", () => {
         });
         expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
       })
-      .catch((_err) => {
+      .catch(() => {
         expect(1).toBe(2);
       });
   });
@@ -568,7 +568,7 @@ describe("mergeConfig()...", () => {
         });
         expect(spyLoggerDebug).toHaveBeenCalledTimes(1);
       })
-      .catch((_err) => {
+      .catch(() => {
         expect(1).toBe(2);
       });
   });

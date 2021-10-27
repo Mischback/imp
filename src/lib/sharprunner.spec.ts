@@ -87,7 +87,7 @@ describe("SharpRunner._buildPipes()...", () => {
     });
 
     /* make the assertions */
-    return runner._buildPipes().catch((err) => {
+    return runner._buildPipes().catch((err: Error) => {
       expect(err.message).toBe("testError");
       expect(createPipeSpy).toHaveBeenCalledTimes(1);
     });
@@ -590,7 +590,7 @@ describe("SharpRunner._processPipes()...", () => {
     const runner = new SharpRunner(testInputFile, testConfig);
 
     /* make the assertions */
-    return runner._processPipes([]).catch((err) => {
+    return runner._processPipes([]).catch((err: Error) => {
       expect(err.message).toBe("No pipes to process");
     });
   });
@@ -624,7 +624,7 @@ describe("SharpRunner._processPipes()...", () => {
     /* make the assertions */
     return runner
       ._processPipes([testPromise as unknown as sharp.Sharp])
-      .catch((err) => {
+      .catch((err: Error) => {
         expect(err.message).toBe("Error while processing the pipes");
         expect(mockStreamOn).toHaveBeenCalledTimes(2);
       });
@@ -695,7 +695,7 @@ describe("SharpRunner.process()...", () => {
       });
 
     /* make the assertions */
-    return runner.process().catch((err) => {
+    return runner.process().catch((err: Error) => {
       expect(err).toBeInstanceOf(SharpRunnerError);
       expect(buildPipesSpy).toHaveBeenCalledTimes(1);
     });
@@ -731,7 +731,7 @@ describe("SharpRunner.process()...", () => {
       });
 
     /* make the assertions */
-    return runner.process().catch((err) => {
+    return runner.process().catch((err: Error) => {
       expect(err).toBeInstanceOf(SharpRunnerError);
       expect(buildPipesSpy).toHaveBeenCalledTimes(1);
       expect(processPipesSpy).toHaveBeenCalledTimes(1);
@@ -805,7 +805,7 @@ describe("SharpRunner.process()...", () => {
       });
 
     /* make the assertions */
-    return runner.process().catch((err) => {
+    return runner.process().catch((err: Error) => {
       expect(err).toBeInstanceOf(SharpRunnerError);
       expect(err.message).toBe(
         `Unexpected error while processing ${testInputFile}`
@@ -904,7 +904,7 @@ describe("processImageList()...", () => {
     SharpRunner.prototype.process = mockProcess;
 
     /* make the assertions */
-    return processImageList(testConfig).catch((err) => {
+    return processImageList(testConfig).catch((err: Error) => {
       expect(err).toBe("foo");
       expect(mockProcess).toHaveBeenCalledTimes(1);
     });
