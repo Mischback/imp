@@ -42,7 +42,7 @@ describe("impMain()...", () => {
     const processSpy = jest.spyOn(process, "on");
 
     /* make the assertions */
-    return impMain(testArgv).catch((err) => {
+    return impMain(testArgv).catch((err: Error) => {
       expect(err).toBe(78);
       expect(processSpy).toHaveBeenCalledTimes(1);
     });
@@ -54,10 +54,10 @@ describe("impMain()...", () => {
 
     /* setup mocks and spies */
     (getConfig as jest.Mock).mockRejectedValue(new ImpConfigureError("foo"));
-    (suppressLogOutput as jest.Mock).mockImplementation(() => {});
+    (suppressLogOutput as jest.Mock).mockImplementation();
 
     /* make the assertions */
-    return impMain(testArgv).catch((err) => {
+    return impMain(testArgv).catch((err: Error) => {
       expect(err).toBe(78);
       expect(suppressLogOutput).toHaveBeenCalledTimes(1);
     });
@@ -69,10 +69,10 @@ describe("impMain()...", () => {
 
     /* setup mocks and spies */
     (getConfig as jest.Mock).mockRejectedValue(new ImpConfigureError("foo"));
-    (applyDebugConfiguration as jest.Mock).mockImplementation(() => {});
+    (applyDebugConfiguration as jest.Mock).mockImplementation();
 
     /* make the assertions */
-    return impMain(testArgv).catch((err) => {
+    return impMain(testArgv).catch((err: Error) => {
       expect(err).toBe(78);
       expect(applyDebugConfiguration).toHaveBeenCalledTimes(1);
     });
@@ -84,11 +84,11 @@ describe("impMain()...", () => {
 
     /* setup mocks and spies */
     (getConfig as jest.Mock).mockRejectedValue(new ImpConfigureError("foo"));
-    (suppressLogOutput as jest.Mock).mockImplementation(() => {});
-    (applyDebugConfiguration as jest.Mock).mockImplementation(() => {});
+    (suppressLogOutput as jest.Mock).mockImplementation();
+    (applyDebugConfiguration as jest.Mock).mockImplementation();
 
     /* make the assertions */
-    return impMain(testArgv).catch((err) => {
+    return impMain(testArgv).catch((err: Error) => {
       expect(err).toBe(78);
       expect(suppressLogOutput).toHaveBeenCalledTimes(1);
       expect(applyDebugConfiguration).toHaveBeenCalledTimes(1);
@@ -106,10 +106,10 @@ describe("impMain()...", () => {
     (processImageList as jest.Mock).mockRejectedValue(
       new SharpRunnerError("foo")
     );
-    (applyUserConfiguration as jest.Mock).mockImplementation(() => {});
+    (applyUserConfiguration as jest.Mock).mockImplementation();
 
     /* make the assertions */
-    return impMain(testArgv).catch((err) => {
+    return impMain(testArgv).catch((err: Error) => {
       expect(err).toBe(65);
       expect(applyUserConfiguration).toHaveBeenCalledTimes(1);
     });
@@ -122,7 +122,7 @@ describe("impMain()...", () => {
     /* setup mocks and spies */
     (getConfig as jest.Mock).mockRejectedValue(new Error("foo"));
     /* make the assertions */
-    return impMain(testArgv).catch((err) => {
+    return impMain(testArgv).catch((err: Error) => {
       expect(err).toBe(70);
     });
   });

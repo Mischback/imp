@@ -113,7 +113,7 @@ export class SharpRunner {
         .then((numberOfProcessedPipes) => {
           return resolve(numberOfProcessedPipes);
         })
-        .catch((err) => {
+        .catch((err: Error) => {
           if (err instanceof SharpRunnerError) return reject(err);
 
           logger.debug(err);
@@ -276,7 +276,7 @@ export class SharpRunner {
           logger.debug("Completed processing all pipes. Resolving!");
           return resolve(sharpPipes.length);
         })
-        .catch((err) => {
+        .catch((err: Error) => {
           logger.debug(err);
           return reject(
             new SharpRunnerProcessError("Error while processing the pipes")
@@ -327,7 +327,7 @@ export function processImageList(configObject: ImpConfig): Promise<number> {
         logger.debug(retVals);
         return resolve(retVals.reduce((a, b) => a + b, 0));
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         return reject(err);
       });
   });
