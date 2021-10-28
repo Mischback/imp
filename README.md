@@ -1,15 +1,38 @@
 # ImP
 
-![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/mischback/imp/development)
-![GitHub branch checks state](https://img.shields.io/github/workflow/status/mischback/imp/CI%20main%20branches?style=flat&logo=github)
+![npm (scoped)](https://img.shields.io/npm/v/@mischback/imp?style=flat)
+![GitHub package.json version (development)](https://img.shields.io/github/package-json/v/mischback/imp/development?style=flat)
+![GitHub branch checks state](https://img.shields.io/github/workflow/status/mischback/imp/CI%20default%20branch?style=flat&logo=github)
 [![Coverage Status](https://coveralls.io/repos/github/Mischback/imp/badge.svg)](https://coveralls.io/github/Mischback/imp)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat&logo=prettier)](https://github.com/prettier/prettier)
-![GitHub](https://img.shields.io/github/license/mischback/imp)
+![GitHub License](https://img.shields.io/github/license/mischback/imp?style=flat)
 
 **ImP** is the abbreviation of _image processor_. Basically it is a wrapper
 around the wonderful [Sharp](https://github.com/lovell/sharp) module, providing
 an easy to use interface to make Sharp usable in a front-end development
 workflow.
+
+## Installation
+
+Just install _ImP_ from **npm**:
+
+```
+npm install --save-dev @mischback/imp
+```
+
+Most likely you will want to install it as a development dependency for internal
+usage (see below for _Security Considerations_).
+
+## Usage
+
+After installation, _ImP_ is available using the following command:
+
+```
+npx imp
+```
+
+Please note, that a configuration file is required, see below for configuration
+options and command line parameters.
 
 ## Configuration
 

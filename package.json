@@ -1,9 +1,41 @@
 {
+  "name": "@mischback/imp",
+  "description": "A wrapper around Sharp, providing an easy to use interface to make Sharp usable in a front-end development workflow.",
+  "version": "0.0.1-alpha-4",
+  "main": "dist/index.js",
+  "bin": {
+    "imp": "dist/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mischback/imp.git"
+  },
+  "keywords": [
+    "sharp",
+    "image processing",
+    "responsive images",
+    "image",
+    "processing",
+    "responsive"
+  ],
+  "author": "Mischback",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mischback/imp/issues"
+  },
+  "homepage": "https://github.com/Mischback/imp#readme",
+  "dependencies": {
+    "cosmiconfig": "7.0.1",
+    "sharp": "0.29.2",
+    "stdio": "2.1.1",
+    "tslog": "3.2.2"
+  },
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/sharp": "0.29.2",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
+    "clean-publish": "^3.4.2",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
     "jest": "^27.2.5",
@@ -13,10 +45,30 @@
     "ts-jest": "^27.0.7",
     "typescript": "^4.4.4"
   },
-  "dependencies": {
-    "cosmiconfig": "7.0.1",
-    "sharp": "0.29.2",
-    "stdio": "2.1.1",
-    "tslog": "3.2.2"
+  "clean-publish": {
+    "files": [
+      ".github",
+      ".make-stamps",
+      ".manual-test",
+      ".vscode",
+      "dist/.gitignore",
+      "docs",
+      "src",
+      ".editorconfig",
+      ".eslintrc.json",
+      ".gitignore",
+      ".imprc.json",
+      ".jestrc.ci.json",
+      ".jestrc.json",
+      ".lintstagedrc.json",
+      ".nvmrc",
+      ".prettierignore",
+      ".simple-git-hooks.json",
+      "Makefile",
+      "package-lock.json",
+      "tsconfig.json",
+      "tsconfig.build.json"
+    ],
+    "packageManager": "npm"
   }
 }
