@@ -1,4 +1,32 @@
 {
+  "name": "@mischback/imp",
+  "description": "A wrapper around Sharp, providing an easy to use interface to make Sharp usable in a front-end development workflow.",
+  "version": "0.0.1-alpha-1",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mischback/imp.git"
+  },
+  "keywords": [
+    "sharp",
+    "image processing",
+    "responsive images",
+    "image",
+    "processing",
+    "responsive"
+  ],
+  "author": "Mischback",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mischback/imp/issues"
+  },
+  "homepage": "https://github.com/Mischback/imp#readme",
+  "dependencies": {
+    "cosmiconfig": "7.0.1",
+    "sharp": "0.29.2",
+    "stdio": "2.1.1",
+    "tslog": "3.2.2"
+  },
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/sharp": "0.29.2",
@@ -13,12 +41,6 @@
     "simple-git-hooks": "^2.7.0",
     "ts-jest": "^27.0.7",
     "typescript": "^4.4.4"
-  },
-  "dependencies": {
-    "cosmiconfig": "7.0.1",
-    "sharp": "0.29.2",
-    "stdio": "2.1.1",
-    "tslog": "3.2.2"
   },
   "clean-publish": {
     "files": [
