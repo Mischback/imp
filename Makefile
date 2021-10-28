@@ -72,6 +72,11 @@ ci/release : util/clean-publish
 	npm publish --access public
 .PHONY : ci/release
 
+ci/testing :
+	ls -lah && \
+	npx jest --config .jestrc.json
+.PHONY : ci/test
+
 clean :
 	find dist -not -name .gitignore -not -name dist -delete && \
 	rm -f $(STAMP_TS_COMPILED) && \
