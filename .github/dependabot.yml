@@ -7,6 +7,7 @@ updates:
       interval: "weekly"
     assignees:
       - "mischback"
+    target-branch: "dependabot-updates"
 
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
@@ -15,6 +16,7 @@ updates:
       interval: "daily"
     assignees:
       - "mischback"
+    target-branch: "dependabot-updates"
     commit-message:
       prefix: "npm"
       prefix-development: "npm dev"
