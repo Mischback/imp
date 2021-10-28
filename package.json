@@ -26,6 +26,7 @@
       ".make-stamps",
       ".manual-test",
       ".vscode",
+      "dist/.gitignore",
       "docs",
       "src",
       ".editorconfig",
@@ -38,6 +39,7 @@
       ".nvmrc",
       ".prettierignore",
       ".simple-git-hooks.json",
+      "Makefile",
       "package-lock.json",
       "tsconfig.json"
     ],
