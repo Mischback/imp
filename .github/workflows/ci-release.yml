@@ -1,0 +1,21 @@
+name: CI release
+
+on:
+  push:
+    branches: [release-workflow]
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run linters
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+      - run: npm ci
+      - run: make ci/linting
+      - run: make ci/testing
+      - run: make ci/release
