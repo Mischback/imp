@@ -63,7 +63,8 @@
       ".simple-git-hooks.json",
       "Makefile",
       "package-lock.json",
-      "tsconfig.json"
+      "tsconfig.json",
+      "tsconfig.build.json"
     ],
     "packageManager": "npm"
   }

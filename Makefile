@@ -62,6 +62,12 @@ ci/linting :
 	npx eslint "**/*.ts"
 .PHONY : ci/linting
 
+clean :
+	find dist -not -name .gitignore -not -name dist -delete && \
+	rm -f $(STAMP_TS_COMPILED) && \
+	rm -rf $(CLEAN_PUBLISH_DIR)
+.PHONY : clean
+
 # Build the project
 dev/build : dev/compile
 .PHONY : dev/build
@@ -91,7 +97,7 @@ lint/prettier : | $(STAMP_NODE_INSTALL)
 
 # Use clean-publish to remove unnecessary files and fields in package.json
 # As of now, this recipe does not perform the actual publish step!
-util/clean-publish : | $(STAMP_NODE_INSTALL)
+util/clean-publish : $(STAMP_TS_COMPILED) | $(STAMP_NODE_INSTALL)
 	npx clean-publish --without-publish --temp-dir $(CLEAN_PUBLISH_DIR) && \
 	rm -f $(CLEAN_PUBLISH_DIR)/dist/.gitignore
 .PHONY : util/clean-publish
@@ -100,10 +106,19 @@ util/clean-publish : | $(STAMP_NODE_INSTALL)
 util/githooks : $(STAMP_GIT_HOOKS)
 .PHONY : util/githooks
 
-# Provide a pre-configured tree command for convenience
-tree :
-	tree -a -I ".make-stamps|.manual-test|.vscode|.git|node_modules|$(CLEAN_PUBLISH_DIR)" --dirsfirst -c
+# Run tree to see the project files
+tree : tree/project
 .PHONY : tree
+
+# Provide a pre-configured tree command for convenience, showing project files
+tree/project :
+	tree -a -I ".make-stamps|.manual-test|.vscode|.git|node_modules|$(CLEAN_PUBLISH_DIR)" --dirsfirst -c
+.PHONY : tree/project
+
+# Provide a pre-configured tree command to show the files to be published
+tree/publish :
+	tree -a --dirsfirst -c $(CLEAN_PUBLISH_DIR)
+.PHONY : tree/publish
 
 
 # Actually execute simple-git-hooks' cli script to apply the configured hooks
