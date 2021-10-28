@@ -80,7 +80,8 @@ lint/prettier : | $(STAMP_NODE_INSTALL)
 .PHONY : lint/prettier
 
 util/clean-publish : | $(STAMP_NODE_INSTALL)
-	npx clean-publish --without-publish --temp-dir tmpCleanPublish
+	npx clean-publish --without-publish --temp-dir tmpCleanPublish && \
+	rm -f tmpCleanPublish/dist/.gitignore
 .PHONY : util/clean-publish
 
 # Apply/update the git hooks
@@ -109,5 +110,5 @@ $(STAMP_NODE_INSTALL) : package.json
 
 $(STAMP_TS_COMPILED) : $(SRC_FILES) | $(STAMP_NODE_INSTALL)
 	$(create_dir)
-	npx tsc
+	npx tsc --project tsconfig.build.json
 	touch $@
