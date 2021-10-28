@@ -23,6 +23,17 @@ npm install --save-dev @mischback/imp
 Most likely you will want to install it as a development dependency for internal
 usage (see below for _Security Considerations_).
 
+## Usage
+
+After installation, _ImP_ is available using the following command:
+
+```
+npx imp
+```
+
+Please note, that a configuration file is required, see below for configuration
+options and command line parameters.
+
 ## Configuration
 
 _ImP_ is configured by its configuration file and command line parameters.
