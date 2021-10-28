@@ -62,6 +62,16 @@ ci/linting :
 	npx eslint "**/*.ts"
 .PHONY : ci/linting
 
+# Triggering a release to npm.
+# Please note that this recipe does not ensure the installation of NodeJS
+# packages. The project's CI configuration must take care of any prerequisites,
+# i.e. by installing all required packages.
+# See .github/workflows/ci-release.yml
+ci/release : util/clean-publish
+	cd $(CLEAN_PUBLISH_DIR) && \
+	npm publish --access public
+.PHONY : ci/release
+
 clean :
 	find dist -not -name .gitignore -not -name dist -delete && \
 	rm -f $(STAMP_TS_COMPILED) && \
@@ -97,7 +107,10 @@ lint/prettier : | $(STAMP_NODE_INSTALL)
 
 # Use clean-publish to remove unnecessary files and fields in package.json
 # As of now, this recipe does not perform the actual publish step!
-util/clean-publish : $(STAMP_TS_COMPILED) | $(STAMP_NODE_INSTALL)
+# Please note that this recipe does not directly ensure that the required
+# NodeJS packages are installed (on the other hand, this *should* be ensured by
+# the  STMAP_TS_COMPILED recipe).
+util/clean-publish : $(STAMP_TS_COMPILED)
 	npx clean-publish --without-publish --temp-dir $(CLEAN_PUBLISH_DIR) && \
 	rm -f $(CLEAN_PUBLISH_DIR)/dist/.gitignore
 .PHONY : util/clean-publish
@@ -135,6 +148,9 @@ $(STAMP_NODE_INSTALL) : package.json
 	npm install
 	touch $@
 
+# Compile TypeScript sources to JavaScript.
+# Additionally, source maps and type declarations are created and *should* be
+# included into the actual release.
 $(STAMP_TS_COMPILED) : $(SRC_FILES) | $(STAMP_NODE_INSTALL)
 	$(create_dir)
 	npx tsc --project tsconfig.build.json
