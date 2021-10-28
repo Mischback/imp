@@ -72,8 +72,8 @@ ci/release : util/clean-publish
 	npm publish --access public
 .PHONY : ci/release
 
+# Run the tests only, without coverage
 ci/testing :
-	ls -lah && \
 	npx jest --config .jestrc.json
 .PHONY : ci/test
 
