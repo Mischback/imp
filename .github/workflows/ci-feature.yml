@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: 16.x
           cache: "npm"
-      - run: npm ci --ignore-scripts
+      - run: npm ci
       - run: make ci/linting
 
   testing:
@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm ci --ignore-scripts
+      - run: npm ci
       - run: make ci/coverage
       - name: Coveralls
         uses: coverallsapp/github-action@master
