@@ -13,6 +13,9 @@ SRC_DIR := src
 # file.
 MAKE_STAMP_DIR := .make-stamps
 
+# Use this temporary directory to run util/clean-publish
+CLEAN_PUBLISH_DIR := tmpCleanPublish
+
 
 # ### INTERNAL
 
@@ -80,8 +83,8 @@ lint/prettier : | $(STAMP_NODE_INSTALL)
 .PHONY : lint/prettier
 
 util/clean-publish : | $(STAMP_NODE_INSTALL)
-	npx clean-publish --without-publish --temp-dir tmpCleanPublish && \
-	rm -f tmpCleanPublish/dist/.gitignore
+	npx clean-publish --without-publish --temp-dir $(CLEAN_PUBLISH_DIR) && \
+	rm -f $(CLEAN_PUBLISH_DIR)/dist/.gitignore
 .PHONY : util/clean-publish
 
 # Apply/update the git hooks
@@ -90,7 +93,7 @@ util/githooks : $(STAMP_GIT_HOOKS)
 
 # Provide a pre-configured tree command for convenience
 tree :
-	tree -a -I ".make-stamps|.git|node_modules" --dirsfirst -c
+	tree -a -I ".make-stamps|.manual-test|.vscode|.git|node_modules|$(CLEAN_PUBLISH_DIR)" --dirsfirst -c
 .PHONY : tree
 
 
