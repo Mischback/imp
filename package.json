@@ -19,5 +19,28 @@
     "sharp": "0.29.2",
     "stdio": "2.1.1",
     "tslog": "3.2.2"
+  },
+  "clean-publish": {
+    "files": [
+      ".github",
+      ".make-stamps",
+      ".manual-test",
+      ".vscode",
+      "docs",
+      "src",
+      ".editorconfig",
+      ".eslintrc.json",
+      ".gitignore",
+      ".imprc.json",
+      ".jestrc.ci.json",
+      ".jestrc.json",
+      ".lintstagedrc.json",
+      ".nvmrc",
+      ".prettierignore",
+      ".simple-git-hooks.json",
+      "package-lock.json",
+      "tsconfig.json"
+    ],
+    "packageManager": "npm"
   }
 }

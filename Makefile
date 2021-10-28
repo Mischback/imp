@@ -79,6 +79,10 @@ lint/prettier : | $(STAMP_NODE_INSTALL)
 	npx prettier . --ignore-unknown --write
 .PHONY : lint/prettier
 
+util/clean-publish : | $(STAMP_NODE_INSTALL)
+	npx clean-publish --without-publish --temp-dir tmpCleanPublish
+.PHONY : util/clean-publish
+
 # Apply/update the git hooks
 util/githooks : $(STAMP_GIT_HOOKS)
 .PHONY : util/githooks

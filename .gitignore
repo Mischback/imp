@@ -19,3 +19,6 @@ node_modules
 # it's actually embarassing, but I *do* manual testing. But this should not go
 # upstream. (;
 .manual-test
+
+# don't track clean-publish's temporary directory
+tmpCleanPublish
