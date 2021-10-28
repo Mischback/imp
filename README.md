@@ -11,6 +11,17 @@ around the wonderful [Sharp](https://github.com/lovell/sharp) module, providing
 an easy to use interface to make Sharp usable in a front-end development
 workflow.
 
+## Installation
+
+Just install _ImP_ from **npm**:
+
+```
+npm install --save-dev @mischback/imp
+```
+
+Most likely you will want to install it as a development dependency for internal
+usage (see below for _Security Considerations_).
+
 ## Configuration
 
 _ImP_ is configured by its configuration file and command line parameters.
