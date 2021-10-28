@@ -1,8 +1,11 @@
 {
   "name": "@mischback/imp",
   "description": "A wrapper around Sharp, providing an easy to use interface to make Sharp usable in a front-end development workflow.",
-  "version": "0.0.1-alpha-2",
+  "version": "0.0.1-alpha-3",
   "main": "dist/index.js",
+  "bin": {
+    "imp": "dist/cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Mischback/imp.git"
