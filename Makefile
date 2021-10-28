@@ -46,11 +46,18 @@ build : dev/build
 # Please note that this recipe does not define any prerequisites. The project's
 # CI configuration must take care of any prerequisites, i.e. by installing all
 # required packages.
-# As of now, you may refer to .github/workflows/node_ci.yml
+# As of now, you may refer to .github/workflows/ci-featrue.yml and
+# .github/workflows/ci-main.yml
 ci/coverage :
 	npx jest --config .jestrc.ci.json
 .PHONY : ci/coverage
 
+# Linting is run as part of the CI pipelines to ensure code quality.
+# Please note that this recipe does not define any prerequisites. The project's
+# CI configuration must take care of any prerequisites, i.e. by installing all
+# required packages.
+# As of now, you may refer to .github/workflows/ci-featrue.yml and
+# .github/workflows/ci-main.yml
 ci/linting :
 	npx eslint "**/*.ts"
 .PHONY : ci/linting
@@ -82,6 +89,8 @@ lint/prettier : | $(STAMP_NODE_INSTALL)
 	npx prettier . --ignore-unknown --write
 .PHONY : lint/prettier
 
+# Use clean-publish to remove unnecessary files and fields in package.json
+# As of now, this recipe does not perform the actual publish step!
 util/clean-publish : | $(STAMP_NODE_INSTALL)
 	npx clean-publish --without-publish --temp-dir $(CLEAN_PUBLISH_DIR) && \
 	rm -f $(CLEAN_PUBLISH_DIR)/dist/.gitignore
