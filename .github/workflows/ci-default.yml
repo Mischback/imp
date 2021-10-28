@@ -1,8 +1,8 @@
-name: CI main branches
+name: CI default branch
 
 on:
   push:
-    branches: [main, master, development]
+    branches: [development]
 
 jobs:
   linting:
