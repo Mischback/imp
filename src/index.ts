@@ -8,5 +8,3 @@ export {
   processImageList,
   SharpRunnerError,
 } from "./lib/sharprunner";
-
-console.log("foobar!");
