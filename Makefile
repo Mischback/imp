@@ -48,6 +48,10 @@ ci/coverage :
 	npx jest --config .jestrc.ci.json
 .PHONY : ci/coverage
 
+ci/linting :
+	npx eslint "**/*.ts"
+.PHONY : ci/linting
+
 # Build the project
 dev/build : dev/compile
 .PHONY : dev/build
