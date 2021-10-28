@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "mischback"
+
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "mischback"
+    commit-message:
+      prefix: "npm"
+      prefix-development: "npm dev"
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      seperator: "-"
