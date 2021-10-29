@@ -20,7 +20,7 @@ then the search is continued upwards (see [cosmiconfig's README](https://github.
   - This option **must** be provided by configuration file!
   - `targets` specify, what _ImP_ should actually do
 
-```
+```JSON
   /* The top-level key **MUST** be named "targets". */
   "targets": {
 
@@ -84,10 +84,11 @@ then the search is continued upwards (see [cosmiconfig's README](https://github.
 
 - `formatOptions`:
   - This option **can** be provided by configuration file only.
-  - `formatOptions` are directly derived from Sharp, for details, see
-    [Sharp's documentation](https://sharp.pixelplumbing.com/api-output).
+  - `formatOptions` are directly derived from Sharp, please see
+    [Sharp's documentation](https://sharp.pixelplumbing.com/api-output) for
+    details.
 
-```
+```JSON
   /* The top-level key **MUST** be named "formatOptions". */
   "formatOptions": {
     /* The key of a single option must match the values in "targets.formats".
@@ -102,6 +103,21 @@ then the search is continued upwards (see [cosmiconfig's README](https://github.
       "force": true
     }
   },
+```
+
+- `loggingOptions`:
+  - This option **can** be provided by configuration file only.
+  - Available options are directly derived from tslog, please see
+    [tslog's documentation](https://tslog.js.org/#/?id=settings) for details.
+
+```JSON
+  /* The top-level key **MUST** be named "loggingOptions". */
+  "loggingOptions": {
+    /* Names and accepted values of these options are directly derived from
+      * tslog and are just passed on to a tslog function internally.
+      */
+    "name": "testconfig"
+  }
 ```
 
 ## Configuration by Command Line

@@ -1,6 +1,7 @@
 # ImP
 
 ![npm (scoped)](https://img.shields.io/npm/v/@mischback/imp?style=flat)
+
 ![GitHub package.json version (development)](https://img.shields.io/github/package-json/v/mischback/imp/development?style=flat)
 ![GitHub branch checks state](https://img.shields.io/github/workflow/status/mischback/imp/CI%20default%20branch?style=flat&logo=github)
 [![Coverage Status](https://coveralls.io/repos/github/Mischback/imp/badge.svg)](https://coveralls.io/github/Mischback/imp)
@@ -16,7 +17,7 @@ workflow.
 
 Just install _ImP_ from **npm**:
 
-```
+```bash
 npm install --save-dev @mischback/imp
 ```
 
@@ -27,7 +28,7 @@ usage (see below for _Security Considerations_).
 
 After installation, _ImP_ is available using the following command:
 
-```
+```bash
 npx imp
 ```
 
