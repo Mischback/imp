@@ -79,7 +79,7 @@ then the search is continued upwards (see [cosmiconfig's README](https://github.
       "formats": ["png", "jpeg", "webp"],
       "height": 500
     }
-  },
+  }
 ```
 
 - `formatOptions`:
@@ -102,7 +102,7 @@ then the search is continued upwards (see [cosmiconfig's README](https://github.
       "quality": 100,
       "force": true
     }
-  },
+  }
 ```
 
 - `loggingOptions`:
@@ -114,10 +114,51 @@ then the search is continued upwards (see [cosmiconfig's README](https://github.
   /* The top-level key **MUST** be named "loggingOptions". */
   "loggingOptions": {
     /* Names and accepted values of these options are directly derived from
-      * tslog and are just passed on to a tslog function internally.
-      */
+     * tslog and are just passed on to a tslog function internally.
+     */
     "name": "testconfig"
   }
 ```
 
+- `inputFiles`:
+  - This option can be provided by configuration file or command line parameters.
+  - If specified by configuration file, a list of paths/filenames - provided as
+    strings - is expected.
+  - Paths will be interpreted as _relative to the current working directory_.
+  - If an input file is specified by command line parameter (by using `-i`),
+    the value from the configuration file is overwritten.
+
+```JSON
+  /* The top-level key **MUST** be named "inputFiles". */
+  "inputFiles": [
+    "path/to/file/a.png",
+    "path/to/file/b.jpg"
+  ]
+```
+
+- `outputDir`:
+  - This option can be provided by configuration file or command line parameters.
+  - If specified by configuration file, a path/directory name - provided as
+    string - is expected.
+  - The path will be interpreted as _relative to the current working directory_.
+  - If an output directory is specififed by command line parameter (by using
+    `-o`), the value from the configuration file is overwritten.
+
+```JSON
+  /* The top-level key **MUST** be named "outputDir". */
+  "outputDir": "path/to/output/directory",
+```
+
 ## Configuration by Command Line
+
+_ImP_ accepts the following command line parameters:
+
+- `--debug`, `-d`: Activate the debug mode; in this mode, cosmiconfig's caching is cleared and additional log messages are emitted;
+- `--configFile`, `-c`: Specify another name/location for the configuration file to be used;
+- `--inputFile`, `-i`: Specify the name/location of the image to be processed. This option may be specified multiple times;
+- `--outputDir`, `-o`: Specify the directory to write the processed images to;
+- `--quiet`, `-q`: Suppress all output.
+
+Please note that providing `--inputFile` and `--outputDir` through
+command line parameters will overwrite the corresponding parameter in the
+configuration file.
