@@ -36,6 +36,9 @@ npx imp
 Please note, that a configuration file is required, see below for configuration
 options and command line parameters.
 
+A more sophisticated usage example is provided in the
+[advanced usage guide](https://github.com/Mischback/imp/blob/development/docs/advanced-usage.md).
+
 ## Configuration
 
 _ImP_ is configured by its configuration file and command line parameters.
@@ -44,7 +47,7 @@ mandatory, as the `TargetConfig` and `FormatConfig` can not be specified by
 command line.
 
 The in-depth description of the configuration file is provided in
-[this specific document](https://github.com/Mischback/imp/blob/development/docs/configuration.md).
+[the configuration guide](https://github.com/Mischback/imp/blob/development/docs/configuration.md).
 
 ### Configuration File
 
