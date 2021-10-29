@@ -37,10 +37,19 @@ options and command line parameters.
 ## Configuration
 
 _ImP_ is configured by its configuration file and command line parameters.
+Providing a configuration file (or the corresponding key in `package.json`) is
+mandatory, as the `TargetConfig` and `FormatConfig` can not be specified by
+command line.
+
+The in-depth description of the configuration file is provided in
+[this specific document](https://github.com/Mischback/imp/blob/development/docs/configuration.md).
+
+### Configuration File
+
 _ImP_ uses [cosmiconfig](https://github.com/davidtheclark/cosmiconfig) to
 retrieve and read the configuration file.
 
-The following locations are checked:
+The following locations are searched:
 
 - key "imp" in `package.json`
 - an extensionless "rc file", in YAML or JSON format: `.imprc`
@@ -49,6 +58,8 @@ The following locations are checked:
 
 The listed filenames/locations are checked in the current working directory and
 then the search is continued upwards (see [cosmiconfig's README](https://github.com/davidtheclark/cosmiconfig/README.md) for further details).
+
+### Configuration by Command Line
 
 Additionally, _ImP_ accepts the following command line parameters:
 
