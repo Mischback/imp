@@ -1,2 +1,10 @@
+// SPDX-License-Identifier: MIT
 
-console.log("foobar");
+export { impMain } from "./main";
+export { TargetConfig, FormatConfig, ImpConfig } from "./lib/configure";
+export { ImpError } from "./lib/errors";
+export {
+  SharpRunner,
+  processImageList,
+  SharpRunnerError,
+} from "./lib/sharprunner";

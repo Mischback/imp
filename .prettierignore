@@ -4,3 +4,4 @@
 # ignoring generated/compiled files as well as 3rd party files.
 
 node_modules
+dist

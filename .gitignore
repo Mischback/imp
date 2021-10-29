@@ -12,3 +12,13 @@ node_modules
 # don't track coverage information
 # (see .jestrc.ci.json)
 **/.coverage
+
+# don't track the modules configuration file
+.imprc.json
+
+# it's actually embarassing, but I *do* manual testing. But this should not go
+# upstream. (;
+.manual-test
+
+# don't track clean-publish's temporary directory
+tmpCleanPublish

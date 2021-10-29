@@ -1,0 +1,55 @@
+name: CI feature branches / pull requests
+
+on:
+  pull_request:
+    branches: [development]
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run linters
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: "npm"
+      - run: npm ci
+      - run: make ci/linting
+
+  testing:
+    needs: linting
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [12.x, 14.x, 16.x]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: OS ${{ matrix.os }} - Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci
+      - run: make ci/coverage
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          flag-name: OS-${{ matrix.os }}_Node-${{ matrix.node-version }}
+          path-to-lcov: ./src/.coverage/lcov.info
+          parallel: true
+
+  finish:
+    needs: testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./src/.coverage/lcov.info
+          parallel-finished: true

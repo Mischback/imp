@@ -13,6 +13,9 @@ SRC_DIR := src
 # file.
 MAKE_STAMP_DIR := .make-stamps
 
+# Use this temporary directory to run util/clean-publish
+CLEAN_PUBLISH_DIR := tmpCleanPublish
+
 
 # ### INTERNAL
 
@@ -43,10 +46,42 @@ build : dev/build
 # Please note that this recipe does not define any prerequisites. The project's
 # CI configuration must take care of any prerequisites, i.e. by installing all
 # required packages.
-# As of now, you may refer to .github/workflows/node_ci.yml
+# As of now, you may refer to .github/workflows/ci-featrue.yml and
+# .github/workflows/ci-main.yml
 ci/coverage :
 	npx jest --config .jestrc.ci.json
 .PHONY : ci/coverage
+
+# Linting is run as part of the CI pipelines to ensure code quality.
+# Please note that this recipe does not define any prerequisites. The project's
+# CI configuration must take care of any prerequisites, i.e. by installing all
+# required packages.
+# As of now, you may refer to .github/workflows/ci-featrue.yml and
+# .github/workflows/ci-main.yml
+ci/linting :
+	npx eslint "**/*.ts"
+.PHONY : ci/linting
+
+# Triggering a release to npm.
+# Please note that this recipe does not ensure the installation of NodeJS
+# packages. The project's CI configuration must take care of any prerequisites,
+# i.e. by installing all required packages.
+# See .github/workflows/ci-release.yml
+ci/release : util/clean-publish
+	cd $(CLEAN_PUBLISH_DIR) && \
+	npm publish --access public
+.PHONY : ci/release
+
+# Run the tests only, without coverage
+ci/testing :
+	npx jest --config .jestrc.json
+.PHONY : ci/test
+
+clean :
+	find dist -not -name .gitignore -not -name dist -delete && \
+	rm -f $(STAMP_TS_COMPILED) && \
+	rm -rf $(CLEAN_PUBLISH_DIR)
+.PHONY : clean
 
 # Build the project
 dev/build : dev/compile
@@ -75,14 +110,33 @@ lint/prettier : | $(STAMP_NODE_INSTALL)
 	npx prettier . --ignore-unknown --write
 .PHONY : lint/prettier
 
+# Use clean-publish to remove unnecessary files and fields in package.json
+# As of now, this recipe does not perform the actual publish step!
+# Please note that this recipe does not directly ensure that the required
+# NodeJS packages are installed (on the other hand, this *should* be ensured by
+# the  STMAP_TS_COMPILED recipe).
+util/clean-publish : $(STAMP_TS_COMPILED)
+	npx clean-publish --without-publish --temp-dir $(CLEAN_PUBLISH_DIR) && \
+	rm -f $(CLEAN_PUBLISH_DIR)/dist/.gitignore
+.PHONY : util/clean-publish
+
 # Apply/update the git hooks
 util/githooks : $(STAMP_GIT_HOOKS)
 .PHONY : util/githooks
 
-# Provide a pre-configured tree command for convenience
-tree :
-	tree -a -I ".make-stamps|.git|node_modules" --dirsfirst -c
+# Run tree to see the project files
+tree : tree/project
 .PHONY : tree
+
+# Provide a pre-configured tree command for convenience, showing project files
+tree/project :
+	tree -a -I ".make-stamps|.manual-test|.vscode|.git|node_modules|$(CLEAN_PUBLISH_DIR)" --dirsfirst -c
+.PHONY : tree/project
+
+# Provide a pre-configured tree command to show the files to be published
+tree/publish :
+	tree -a --dirsfirst -c $(CLEAN_PUBLISH_DIR)
+.PHONY : tree/publish
 
 
 # Actually execute simple-git-hooks' cli script to apply the configured hooks
@@ -99,7 +153,10 @@ $(STAMP_NODE_INSTALL) : package.json
 	npm install
 	touch $@
 
+# Compile TypeScript sources to JavaScript.
+# Additionally, source maps and type declarations are created and *should* be
+# included into the actual release.
 $(STAMP_TS_COMPILED) : $(SRC_FILES) | $(STAMP_NODE_INSTALL)
 	$(create_dir)
-	npx tsc
+	npx tsc --project tsconfig.build.json
 	touch $@
