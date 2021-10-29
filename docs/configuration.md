@@ -82,4 +82,26 @@ then the search is continued upwards (see [cosmiconfig's README](https://github.
   },
 ```
 
+- `formatOptions`:
+  - This option **can** be provided by configuration file only.
+  - `formatOptions` are directly derived from Sharp, for details, see
+    [Sharp's documentation](https://sharp.pixelplumbing.com/api-output).
+
+```
+  /* The top-level key **MUST** be named "formatOptions". */
+  "formatOptions": {
+    /* The key of a single option must match the values in "targets.formats".
+     */
+    "png": {
+      /* Names and accepted values of these options are directly derived from
+       * Sharp and are just passed on to a Sharp function internally.
+       */
+      "progression": false,
+      "compressionLevel": 9,
+      "quality": 100,
+      "force": true
+    }
+  },
+```
+
 ## Configuration by Command Line
