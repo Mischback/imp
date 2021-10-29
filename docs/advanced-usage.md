@@ -121,7 +121,7 @@ $ tree .
  |- package.json
  |- .imprc.json
 
- $ npx imp -i src/b.png -o build/images
+$ npx imp -i src/b.png -o build/images
 $ tree .
  |- build
     |- images
@@ -147,3 +147,18 @@ $ tree .
 ```
 
 ## Example Integration with `make`
+
+_ImP_ can easily be integrated into an actual build workflow. In example, here
+is how you could provide recipes for your `Makefile`:
+
+```Makefile
+SRC_FILES_IMAGES = $(shell find src -type f)
+TARGET_FILES_IMAGES_PATH = $(patsubst src/%, build/images/%, $(SRC_FILES_IMAGES))
+TARGET_FILES_IMAGES = $(addsuffix .png, $(basename $(TARGET_FILES_IMAGES_PATH)))
+
+optimize-images : $(TARGET_FILES_IMAGES)
+.PHONY : optimize-images
+
+build/images/%.png : src/%.*
+  npx imp -o build -i $<
+```
