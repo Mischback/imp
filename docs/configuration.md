@@ -162,3 +162,44 @@ _ImP_ accepts the following command line parameters:
 Please note that providing `--inputFile` and `--outputDir` through
 command line parameters will overwrite the corresponding parameter in the
 configuration file.
+
+## Sample Configuration File
+
+```JSON
+{
+  "inputFiles": [
+    "sample.jpg"
+  ],
+  "outputDir": "build/images",
+  "targets": {
+    "full": {
+      "mode": "do-not-scale",
+      "filenameSuffix": "",
+      "formats": ["png"]
+    },
+    "small": {
+      "mode": "keep-aspect",
+      "filenameSuffix": "-small",
+      "formats": ["png"],
+      "width": 200
+    },
+    "medium": {
+      "mode": "keep-aspect",
+      "filenameSuffix": "-medium",
+      "formats": ["png", "webp"],
+      "height": 500
+    }
+  },
+  "formatOptions": {
+    "png": {
+      "progression": false,
+      "compressionLevel": 9,
+      "quality": 100,
+      "force": true
+    }
+  },
+  "loggingOptions": {
+    "name": "testconfig"
+  }
+}
+```
