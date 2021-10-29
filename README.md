@@ -1,6 +1,8 @@
 # ImP
 
 ![npm (scoped)](https://img.shields.io/npm/v/@mischback/imp?style=flat)
+[![install size](https://packagephobia.com/badge?p=@mischback/imp)](https://packagephobia.com/result?p=@mischback/imp)
+
 ![GitHub package.json version (development)](https://img.shields.io/github/package-json/v/mischback/imp/development?style=flat)
 ![GitHub branch checks state](https://img.shields.io/github/workflow/status/mischback/imp/CI%20default%20branch?style=flat&logo=github)
 [![Coverage Status](https://coveralls.io/repos/github/Mischback/imp/badge.svg)](https://coveralls.io/github/Mischback/imp)
@@ -16,7 +18,7 @@ workflow.
 
 Just install _ImP_ from **npm**:
 
-```
+```bash
 npm install --save-dev @mischback/imp
 ```
 
@@ -27,20 +29,32 @@ usage (see below for _Security Considerations_).
 
 After installation, _ImP_ is available using the following command:
 
-```
+```bash
 npx imp
 ```
 
 Please note, that a configuration file is required, see below for configuration
 options and command line parameters.
 
+A more sophisticated usage example is provided in the
+[advanced usage guide](https://github.com/Mischback/imp/blob/development/docs/advanced-usage.md).
+
 ## Configuration
 
 _ImP_ is configured by its configuration file and command line parameters.
+Providing a configuration file (or the corresponding key in `package.json`) is
+mandatory, as the `TargetConfig` and `FormatConfig` can not be specified by
+command line.
+
+The in-depth description of the configuration file is provided in
+[the configuration guide](https://github.com/Mischback/imp/blob/development/docs/configuration.md).
+
+### Configuration File
+
 _ImP_ uses [cosmiconfig](https://github.com/davidtheclark/cosmiconfig) to
 retrieve and read the configuration file.
 
-The following locations are checked:
+The following locations are searched:
 
 - key "imp" in `package.json`
 - an extensionless "rc file", in YAML or JSON format: `.imprc`
@@ -49,6 +63,8 @@ The following locations are checked:
 
 The listed filenames/locations are checked in the current working directory and
 then the search is continued upwards (see [cosmiconfig's README](https://github.com/davidtheclark/cosmiconfig/README.md) for further details).
+
+### Configuration by Command Line
 
 Additionally, _ImP_ accepts the following command line parameters:
 
@@ -70,6 +86,13 @@ the user.
 
 You should not expose _ImP_ publicly, at least not without some wrapper that
 does perform sanitarization of any user input.
+
+## What about this crazy install size?
+
+_ImP_ is a wrapper around Sharp, which is in fact a very capable interface to
+[libvips](https://github.com/libvips/libvips) itsself.
+
+The install size actually reflects the installation of _libvips_.
 
 ## Contributing
 
