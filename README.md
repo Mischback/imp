@@ -1,6 +1,7 @@
 # ImP
 
 ![npm (scoped)](https://img.shields.io/npm/v/@mischback/imp?style=flat)
+[![install size](https://packagephobia.com/badge?p=@mischback/imp)](https://packagephobia.com/result?p=@mischback/imp)
 
 ![GitHub package.json version (development)](https://img.shields.io/github/package-json/v/mischback/imp/development?style=flat)
 ![GitHub branch checks state](https://img.shields.io/github/workflow/status/mischback/imp/CI%20default%20branch?style=flat&logo=github)
@@ -82,6 +83,13 @@ the user.
 
 You should not expose _ImP_ publicly, at least not without some wrapper that
 does perform sanitarization of any user input.
+
+## What about this crazy install size?
+
+_ImP_ is a wrapper around Sharp, which is in fact a very capable interface to
+[libvips](https://github.com/libvips/libvips) itsself.
+
+The install size actually reflects the installation of _libvips_.
 
 ## Contributing
 
