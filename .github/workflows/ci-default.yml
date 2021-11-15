@@ -3,39 +3,48 @@ name: CI default branch
 on:
   push:
     branches: [development]
+  pull_request:
+    branches: [development]
 
 jobs:
   linting:
+    name: Run linters
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Run linters
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
           cache: "npm"
-      - run: npm ci
-      - run: make ci/linting
+      - name: Install Node modules
+        run: npm ci
+      - name: Run eslint
+        run: make ci/linting
 
   testing:
+    name: Run tests on ${{ matrix.os }} for Node ${{ matrix.node-version }}
     needs: linting
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
         node-version: [12.x, 14.x, 16.x]
-
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
-      - name: OS ${{ matrix.os }} - Node ${{ matrix.node-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup OS ${{ matrix.os }} - Node ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm ci
-      - run: make ci/coverage
-      - name: Coveralls
+      - name: Install Node modules
+        run: npm ci
+      - name: Run tests with Jest
+        run: make ci/coverage
+      - name: Prepare coverage result
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -44,10 +53,11 @@ jobs:
           parallel: true
 
   finish:
+    name: Indicate completion to Coveralls.io
     needs: testing
     runs-on: ubuntu-latest
     steps:
-      - name: Coveralls Finished
+      - name: Finished coverage collection
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
