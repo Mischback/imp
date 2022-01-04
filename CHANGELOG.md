@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2022-01-04
+
+- Dependecy of "tslog" was bumped from 3.3.0 to 3.3.1
+
 ## [1.2.0] - 2021-11-30
 
 ### Added
