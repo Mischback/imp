@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2022-02-02
+
+### Added
+
+- Dependency of "sharp" was bumped from 0.29.3 to 0.30.0
+  Internally, `sharp` changed some names of options. As these are not
+  directly interfaced from _ImP_ but merely handed over to _sharp_, this
+  does not affect _ImP_ directly.
+
 ## [1.3.0] - 2022-01-04
+
+### Added
 
 - Dependecy of "tslog" was bumped from 3.3.0 to 3.3.1
 
