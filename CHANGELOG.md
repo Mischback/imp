@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2022-05-24
+
+- Dependency of "tslog" was bumped to 3.3.3
+- Dependency of "minimalist" was bumped to 1.2.6
+- Dependecy of "sharp" was bumped to 0.30.5
+
 ## [1.4.0] - 2022-02-02
 
 ### Added
