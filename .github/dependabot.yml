@@ -5,7 +5,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    assignees:
+    commit-message:
+      prefix: "[GH Actions]"
+    open-pull-requests-limit: 5
+    reviewers:
       - "mischback"
 
   # Maintain dependencies for npm
@@ -13,11 +16,12 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    assignees:
-      - "mischback"
     commit-message:
-      prefix: "npm"
-      prefix-development: "npm dev"
+      prefix: "[npm]"
+      prefix-development: "[npm dev]"
     open-pull-requests-limit: 10
+    reviewers:
+      - "mischback"
     pull-request-branch-name:
       separator: "-"
+
