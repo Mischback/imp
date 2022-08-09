@@ -6,45 +6,51 @@ on:
   pull_request:
     branches: [development]
 
+# To auto-approve Dependabot-created PRs, the workflow needs permissions to
+# modify Pull Requests
+permissions:
+  pull-requests: write
+
 jobs:
   linting:
-    name: Run linters
+    name: Run Linters
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
           cache: "npm"
-      - name: Install Node modules
+      - name: Install Dependencies
         run: npm ci
-      - name: Run eslint
+      - name: Run all Linters
         run: make ci/linting
 
   testing:
-    name: Run tests on ${{ matrix.os }} for Node ${{ matrix.node-version }}
+    name: Tests (${{ matrix.os }}, ${{ matrix.node-version }})
     needs: linting
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
         node-version: [12.x, 14.x, 16.x]
+
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
       - name: Setup OS ${{ matrix.os }} - Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Install Node modules
+      - name: Install Dependencies
         run: npm ci
-      - name: Run tests with Jest
+      - name: Run Tests
         run: make ci/coverage
-      - name: Prepare coverage result
+      - name: Prepare Coverage Result
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -52,14 +58,38 @@ jobs:
           path-to-lcov: ./src/.coverage/lcov.info
           parallel: true
 
+  # If the workflow is run because of a Dependabot-created PR, automatically
+  # approve the PR if it is a minor/patch update of a dependency.
+  # This requires the completion of the ``testing`` step.
+  dependabot:
+    name: Dependabot (auto approve)
+    needs: testing
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1.3.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Automatically approve minor and patch updates
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
   finish:
-    name: Indicate completion to Coveralls.io
+    name: Finish
     needs: testing
     runs-on: ubuntu-latest
     steps:
-      - name: Finished coverage collection
+      - name: Publish Results to Coveralls.io
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./src/.coverage/lcov.info
           parallel-finished: true
+
