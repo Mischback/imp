@@ -26,7 +26,7 @@
   "homepage": "https://github.com/Mischback/imp#readme",
   "dependencies": {
     "cosmiconfig": "7.0.1",
-    "sharp": "0.30.7",
+    "sharp": "0.31.0",
     "stdio": "2.1.1",
     "tslog": "3.3.3"
   },
