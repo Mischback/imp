@@ -26,13 +26,13 @@
   "homepage": "https://github.com/Mischback/imp#readme",
   "dependencies": {
     "cosmiconfig": "7.0.1",
-    "sharp": "0.30.7",
+    "sharp": "0.31.0",
     "stdio": "2.1.1",
     "tslog": "3.3.3"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
-    "@types/sharp": "0.30.5",
+    "@types/sharp": "0.31.0",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "clean-publish": "^4.0.0",
