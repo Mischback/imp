@@ -28,7 +28,7 @@
     "cosmiconfig": "7.0.1",
     "sharp": "0.30.7",
     "stdio": "2.1.1",
-    "tslog": "3.3.3"
+    "tslog": "4.0.4"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
