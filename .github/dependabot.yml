@@ -1,27 +1,27 @@
 version: 2
 updates:
-  # Maintain dependencies for GitHub Actions
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 10
     commit-message:
       prefix: "[GH Actions]"
-    open-pull-requests-limit: 5
-    reviewers:
-      - "mischback"
+    labels:
+      - "area/dependencies"
+      - "lang/github-actions"
 
-  # Maintain dependencies for npm
+  # JavaScript / TypeScript (NPM)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    open-pull-requests-limit: 10
     commit-message:
       prefix: "[npm]"
       prefix-development: "[npm dev]"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "mischback"
-    pull-request-branch-name:
-      separator: "-"
-
+    labels:
+      - "area/dependencies"
+      - "lang/js"
+      - "lang/ts"

@@ -1,4 +1,6 @@
+// SPDX-FileCopyrightText: 2022 Mischback
 // SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
 
 /* test specific imports */
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
