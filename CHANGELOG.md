@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2022-11-18
+
+- **Dropped** support for NodeJS 12.1 (not longer supported by ``sharp``)
+- Dependency of "sharp" was bumped to 0.31.2
+- Dependency of "CosmicConfig" was bumped to 7.1.0
+- Modified the configuration for ``dependabot`` as per
+  https://github.com/Mischback/development-meta/issues/2
+
 ## [1.7.0] - 2022-08-09
 
 - Dependency of "sharp" was bumped to 0.30.7
