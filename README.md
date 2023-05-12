@@ -14,6 +14,14 @@ around the wonderful [Sharp](https://github.com/lovell/sharp) module, providing
 an easy to use interface to make Sharp usable in a front-end development
 workflow.
 
+## Out of Maintanence
+
+_ImP_ is **out of maintenance** until further notice.
+
+There will be no additional features, and **no bugfixes**. If you're interested
+in taking over this project, you may use GitHub to get in touch (e.g. by
+posting an issue in this repository).
+
 ## Installation
 
 Just install _ImP_ from **npm**:
