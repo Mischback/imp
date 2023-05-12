@@ -4,7 +4,7 @@
 [![install size](https://packagephobia.com/badge?p=@mischback/imp)](https://packagephobia.com/result?p=@mischback/imp)
 
 ![GitHub package.json version (development)](https://img.shields.io/github/package-json/v/mischback/imp/development?style=flat)
-![GitHub branch checks state](https://img.shields.io/github/workflow/status/mischback/imp/CI%20default%20branch?style=flat&logo=github)
+![GitHub branch checks state](https://img.shields.io/github/actions/workflow/status/mischback/imp/ci-default.yml?branch=development&style=flat&logo=github)
 [![Coverage Status](https://coveralls.io/repos/github/Mischback/imp/badge.svg)](https://coveralls.io/github/Mischback/imp)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat&logo=prettier)](https://github.com/prettier/prettier)
 ![GitHub License](https://img.shields.io/github/license/mischback/imp?style=flat)
@@ -13,6 +13,14 @@
 around the wonderful [Sharp](https://github.com/lovell/sharp) module, providing
 an easy to use interface to make Sharp usable in a front-end development
 workflow.
+
+## Out of Maintanence
+
+_ImP_ is **out of maintenance** until further notice.
+
+There will be no additional features, and **no bugfixes**. If you're interested
+in taking over this project, you may use GitHub to get in touch (e.g. by
+posting an issue in this repository).
 
 ## Installation
 
